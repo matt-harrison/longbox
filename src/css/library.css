@@ -1,0 +1,106 @@
+body, div, h1, h2, h3, p, input, button, select, fieldset {
+  display: block;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+
+  background-clip: padding-box
+}
+
+ol, ul {
+  margin: 0;
+}
+
+body, input, button, select, fieldset {
+  font: 10pt courier new;
+}
+
+input[type="text"], input[type="password"], button, select {
+  height: 30px;
+}
+
+input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {line-height: 1;}
+
+.absolute {position: absolute;}
+.relative {position: relative;}
+
+.overflow-hidden {overflow: hidden;}
+
+.flex {display: flex;}
+
+.flex-wrap {flex-wrap: wrap;}
+
+.flex-col {flex-direction: column;}
+
+.spaceBetween  {justify-content: space-between;}
+.justifyCenter {justify-content: center;}
+
+.alignCenter {align-items: center;}
+
+.bdrBox {
+  box-sizing: border-box;
+}
+
+.m5  {margin:        5px;}
+.mr5 {margin-right:  5px;}
+.mb5 {margin-bottom: 5px;}
+
+.mr10 {margin-right: 10px;}
+
+.mAuto {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.bdrBlack {border: 1px solid #000;}
+.bdrGray  {border: 1px solid #999;}
+
+.p5 {padding: 5px;}
+
+.flex20 {width: 20%;}
+.flex80 {width: 80%;}
+.flex33 {width: 33.33%}
+.flex50 {width: 50%}
+
+.flex100, .wFull {width: 100%;}
+
+.w100 {max-width: 100px;}
+.w600 {max-width: 600px;}
+
+.bgWhite {background-color: #fff;}
+
+.fs14 {font-size: 14pt;}
+
+.bold {font-weight: bold;}
+
+.txtBlue                   {color: blue;}
+.txtGray                   {color: gray;}
+.txtRed                    {color: red;}
+.txtBlack, .txtBlack:hover {color: black;}
+
+.txtC {text-align: center;}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.csrPointer {cursor: pointer;}
+
+#addItemButton {
+  min-height: 65px;
+}
+
+@media only screen and (max-width: 600px) {
+}
+
+@media only screen and (min-width: 601px) {
+  .m-flex1 {flex-grow: 1;}
+  .m-flex-row {flex-direction: row;}
+
+  .m-mb0 {margin-bottom: 0;}
+
+  .m-w100 {width: 100px;}
+}
