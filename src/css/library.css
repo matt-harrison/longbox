@@ -1,18 +1,16 @@
-body, div, h1, h2, h3, p, input, button, select, fieldset {
+body, div, h1, h2, h3, p, label, input, button, select, textarea, fieldset {
   display: block;
   margin: 0;
   border: 0;
   border-radius: 0;
   padding: 0;
-
-  background-clip: padding-box
 }
 
 ol, ul {
   margin: 0;
 }
 
-body, input, button, select, fieldset, h1, h2 {
+body, input, button, select, textarea, fieldset, h1, h2 {
   font: 10pt courier new;
 }
 
@@ -33,6 +31,7 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 .flex-col {flex-direction: column;}
 
+.spaceAround   {justify-content: space-around;}
 .spaceBetween  {justify-content: space-between;}
 .justifyCenter {justify-content: center;}
 
@@ -49,6 +48,8 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 .mb5  {margin-bottom:  5px;}
 .mb10 {margin-bottom: 10px;}
+
+.ml10 {margin-left: 10px;}
 
 .mAuto {
   margin-right: auto;
@@ -70,6 +71,8 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 .w100 {max-width: 100px;}
 .w600 {max-width: 600px;}
+
+.w-1\/2 {width: 50%;}
 
 .bgWhite {background-color: #fff;}
 
