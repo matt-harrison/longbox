@@ -12,7 +12,7 @@ ol, ul {
   margin: 0;
 }
 
-body, input, button, select, fieldset {
+body, input, button, select, fieldset, h1, h2 {
   font: 10pt courier new;
 }
 
@@ -42,11 +42,13 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
   box-sizing: border-box;
 }
 
-.m5  {margin:        5px;}
-.mr5 {margin-right:  5px;}
-.mb5 {margin-bottom: 5px;}
+.m5  {margin: 5px;}
 
+.mr5  {margin-right:  5px;}
 .mr10 {margin-right: 10px;}
+
+.mb5  {margin-bottom:  5px;}
+.mb10 {margin-bottom: 10px;}
 
 .mAuto {
   margin-right: auto;
@@ -56,7 +58,8 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 .bdrBlack {border: 1px solid #000;}
 .bdrGray  {border: 1px solid #999;}
 
-.p5 {padding: 5px;}
+.p5  {padding:  5px;}
+.p10 {padding: 10px;}
 
 .flex20 {width: 20%;}
 .flex80 {width: 80%;}
