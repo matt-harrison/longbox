@@ -34,6 +34,7 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 .spaceAround   {justify-content: space-around;}
 .spaceBetween  {justify-content: space-between;}
 .justifyCenter {justify-content: center;}
+.flexEnd       {justify-content: flex-end;}
 
 .alignCenter {align-items: center;}
 

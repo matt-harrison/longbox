@@ -22,23 +22,6 @@ class App extends React.Component {
     this.getIssues();
   };
 
-  handleSearchChange = (event) => {
-    let search = this.state.search;
-
-    search.any = event.target.value;
-
-    if (this.state.cancelToken) {
-      this.state.cancelToken.cancel();
-    }
-
-    this.setState({
-      cancelToken: axios.CancelToken.source(),
-      search
-    }, () => {
-      this.getIssues();
-    });
-  };
-
   getIssues = () => {
     const data = {
       params: this.state.search
@@ -51,17 +34,9 @@ class App extends React.Component {
     axios.get('https://www.rootbeercomics.com/api/longbox/get.php', data).then(response => {
       if (response) {
         response.data.issues.results.forEach(issue => {
-          issue.isColor = this.getNullableBoolean(issue.is_color);
-          issue.isOwned = this.getNullableBoolean(issue.is_owned);
-          issue.isRead  = this.getNullableBoolean(issue.is_read);
-
-          issue.isColorSet = issue.isColor !== null;
-          issue.isOwnedSet = issue.isOwned !== null;
-          issue.isReadSet  = issue.isRead  !== null;
-
-          delete issue.is_color;
-          delete issue.is_owned;
-          delete issue.is_read;
+          issue.is_color = this.getNullableBoolean(issue.is_color);
+          issue.is_owned = this.getNullableBoolean(issue.is_owned);
+          issue.is_read  = this.getNullableBoolean(issue.is_read);
         });
 
         this.setState({
@@ -84,17 +59,84 @@ class App extends React.Component {
     return output;
   };
 
-  setIssue = (issueId) => {
-    let data = null;
+  handleIssueCheckboxChange = event => {
+    const key   = event.target.id;
+    const issue = this.state.issue;
 
-    this.state.issues.forEach(issue => {
-      if (issue.id === issueId) {
-        data = issue;
-      }
+    issue[key] = !issue[key];
+
+    this.setState({issue});
+  };
+
+  handleIssueTextChange = event => {
+    const key   = event.target.id;
+    const issue = this.state.issue;
+
+    issue[key] = event.target.value;
+
+    this.setState({issue});
+  };
+
+  handleSearchChange = event => {
+    let search = this.state.search;
+
+    search.any = event.target.value;
+
+    if (this.state.cancelToken) {
+      this.state.cancelToken.cancel();
+    }
+
+    this.setState({
+      cancelToken: axios.CancelToken.source(),
+      search
+    }, () => {
+      this.getIssues();
     });
+  };
+
+  setIssue = issueId => {
+    let data   = null;
+
+    if (issueId) {
+      this.state.issues.forEach(issue => {
+        if (issue.id === issueId) {
+          data = issue;
+
+          window.scrollTo(0, 0);
+        }
+      });
+    }
 
     this.setState({
       issue: data
+    });
+  };
+
+  updateIssue = event => {
+    event.preventDefault();
+
+    const issues = this.state.issues.slice();
+    const data   = {
+      params: this.state.issue
+    };
+
+    issues.forEach(issue => {
+      if (issue.id === this.state.issue.id) {
+        issue = this.state.issue;
+      }
+    });
+
+    if (this.state.cancelToken) {
+      data.cancelToken = this.state.cancelToken.token;
+    }
+
+    axios.get('https://www.rootbeercomics.com/api/longbox/update.php', data).then(response => {
+      if (response) {
+        this.setState({
+          cancelToken: null,
+          issues
+        });
+      }
     });
   };
 
@@ -104,11 +146,23 @@ class App extends React.Component {
         <div key={contributor.id} className="flex mb5 ml10">
           <div className="mr10 w100">
             <label htmlFor={`creatorType${contributor.id}`}>type</label>
-            <input id={`creatorType${contributor.id}`} name={`creatorType${contributor.id}`} value={contributor.creator_type} className="bdrBox bdrBlack p5 wFull" />
+            <input
+            className="bdrBox bdrBlack p5 wFull"
+            id={`creatorType${contributor.id}`}
+            name={`creatorType${contributor.id}`}
+            value={contributor.creator_type}
+            onChange={() => {}}
+            />
           </div>
           <div className="wFull">
             <label htmlFor={`creator${contributor.id}`}>name</label>
-            <input id={`creator${contributor.id}`} name={`creator${contributor.id}`} value={contributor.creator} className="bdrBox bdrBlack p5 wFull" />
+            <input
+            className="bdrBox bdrBlack p5 wFull"
+            id={`creator${contributor.id}`}
+            name={`creator${contributor.id}`}
+            value={contributor.creator}
+            onChange={() => {}}
+            />
           </div>
         </div>
       );
@@ -148,7 +202,11 @@ class App extends React.Component {
           }
         </section>
         {this.state.issue && (
-          <section id="issue" className="bdrBox mb5 bdrBlack p10">
+          <form
+          className="bdrBox mb5 bdrBlack p10"
+          id="issue"
+          onSubmit={this.updateIssue}
+          >
             <div className="flex spaceBetween">
               <h2 className="mb10 bold">
                 {this.state.issue.title}
@@ -158,63 +216,130 @@ class App extends React.Component {
             </div>
             <div className="flex spaceBetween mb10">
               <div className="flex">
-                <input type="checkbox" id="isRead" name="isRead" checked={this.state.issue.isReadSet && this.state.issue.isRead} className="mr5 bdrBlack p5" />
-                <label htmlFor="isRead" className={`${this.state.issue.isReadSet ? '' : 'txtRed'}`}>read</label>
+                <input
+                checked={this.state.issue.is_read}
+                className="mr5 bdrBlack p5"
+                id="is_read"
+                name="is_read"
+                onChange={this.handleIssueCheckboxChange}
+                type="checkbox"
+                />
+                <label htmlFor="is_read" className={`${this.state.issue.is_read === null ? 'txtRed' : ''}`}>read</label>
               </div>
               <div className="flex">
-                <input type="checkbox" id="isOwned" name="isOwned" checked={this.state.issue.isOwnedSet && this.state.issue.isOwned} className="mr5 bdrBlack p5" />
-                <label htmlFor="isOwned" className={`${this.state.issue.isOwnedSet ? '' : 'txtRed'}`}>owned</label>
+                <input
+                checked={this.state.issue.is_owned}
+                className="mr5 bdrBlack p5"
+                id="is_owned"
+                name="is_owned"
+                onChange={this.handleIssueCheckboxChange}
+                type="checkbox"
+                />
+                <label htmlFor="is_owned" className={`${this.state.issue.is_owned === null ? 'txtRed' : ''}`}>owned</label>
               </div>
               <div className="flex">
-                <input type="checkbox" id="isColor" name="isColor" checked={this.state.issue.isColorSet && this.state.issue.isColor} className="mr5 bdrBlack p5" />
-                <label htmlFor="isColor" className={`${this.state.issue.isColorSet ? '' : 'txtRed'}`}>color</label>
+                <input
+                checked={this.state.issue.is_color}
+                className="mr5 bdrBlack p5"
+                id="is_color"
+                name="is_color"
+                onChange={this.handleIssueCheckboxChange}
+                type="checkbox"
+                />
+                <label htmlFor="is_color" className={`${this.state.issue.is_color === null ? 'txtRed' : ''}`}>color</label>
               </div>
             </div>
             <div className="flex mb10">
               <div className="mr10 wFull">
                 <label htmlFor="title">title</label>
-                <input id="title" name="title" value={this.state.issue.title} className="bdrBox bdrBlack p5 wFull" />
+                <input
+                className="bdrBox bdrBlack p5 wFull"
+                id="title"
+                name="title"
+                onChange={this.handleIssueTextChange}
+                value={this.state.issue.title}
+                />
               </div>
               <div className="mb10 w100">
                 <label htmlFor="number">number</label>
-                <input id="number" name="number" value={this.state.issue.number} className="bdrBox bdrBlack p5 wFull" />
+                <input
+                className="bdrBox bdrBlack p5 wFull"
+                id="number"
+                name="number"
+                onChange={this.handleIssueTextChange}
+                value={this.state.issue.number || ''}
+                />
               </div>
             </div>
             <div className="mb10">
               <label htmlFor="publisher">publisher</label>
-              <input id="publisher" name="publisher" value={this.state.issue.publisher} className="bdrBox bdrBlack p5 wFull" />
+              <input
+              className="bdrBox bdrBlack p5 wFull"
+              id="publisher"
+              name="publisher"
+              onChange={this.handleIssueTextChange}
+              value={this.state.issue.publisher || ''}
+              />
             </div>
             <div className="mb10">
               <label htmlFor="year">year</label>
-              <input id="year" name="year" value={this.state.issue.year} className="bdrBox bdrBlack p5 wFull" />
+              <input
+              className="bdrBox bdrBlack p5 wFull"
+              id="year"
+              name="year"
+              onChange={this.handleIssueTextChange}
+              value={this.state.issue.year || ''}
+              />
             </div>
             <div className="mb10">
               <label htmlFor="format">format</label>
-              <input id="format" name="format" value={this.state.issue.format} className="bdrBox bdrBlack p5 wFull" />
+              <input
+              className="bdrBox bdrBlack p5 wFull"
+              id="format"
+              name="format"
+              onChange={this.handleIssueTextChange}
+              value={this.state.issue.format}
+              />
             </div>
             <div className="mb10">
               <label htmlFor="notes">notes</label>
-              <textarea id="notes" name="notes" value={this.state.issue.notes} className="bdrBox bdrBlack p5 wFull"></textarea>
+              <textarea
+              className="bdrBox bdrBlack p5 wFull"
+              id="notes"
+              name="notes"
+              onChange={this.handleIssueTextChange}
+              value={this.state.issue.notes}
+              />
             </div>
             {contributors && (
-              <div>
-                <label>contributors</label>
+              <div className="mb10">
+                <label className="mb5">contributors</label>
                 {contributors}
               </div>
             )}
+            <div className="flex flexEnd">
+              <button
+              className="bdrBlack p5 csrPointer"
+              type="submit"
+              >
+                update
+              </button>
+            </div>
+          </form>
+        )}
+        {this.state.issue === null && (
+          <section id="list" className="bdrBox mb5 bdrBlack p5">
+            {
+              this.state.issues.length > 0 ? this.state.issues.map((issue, index) => {
+                return (
+                  <div key={index}>
+                    <span onClick={() => {this.setIssue(issue.id)}} className="csrPointer">{index + 1}. {issue.title}{issue.number ? ` #${issue.number}` : ''}</span>
+                  </div>
+                );
+              }) : (<div>...</div>)
+            }
           </section>
         )}
-        <section id="list" className="bdrBox mb5 bdrBlack p5">
-          {
-            this.state.issues.length > 0 ? this.state.issues.map((issue, index) => {
-              return (
-                <div key={index}>
-                  <span onClick={() => {this.setIssue(issue.id)}} className="csrPointer">{index + 1}. {issue.title}{issue.number ? ` #${issue.number}` : ''}</span>
-                </div>
-              );
-            }) : (<div>...</div>)
-          }
-        </section>
       </div>
     );
   };
