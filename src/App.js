@@ -1,6 +1,10 @@
 import React from 'react';
 import axios from 'axios';
-// import md5 from 'md5';
+import md5 from 'md5';
+
+import SignInForm from './components/SignInForm';
+
+import * as utils from './utils';
 
 import('./css/library.css');
 
@@ -14,7 +18,13 @@ class App extends React.Component {
       search: {
         any: ''
       },
-      issue: null
+      issue: null,
+      login: {
+        md5: null,
+        username:  null
+      },
+      showSignInForm: false,
+      user: utils.getCookie()
     };
   };
 
@@ -34,9 +44,9 @@ class App extends React.Component {
     axios.get('https://www.rootbeercomics.com/api/longbox/get.php', data).then(response => {
       if (response) {
         response.data.issues.results.forEach(issue => {
-          issue.is_color = this.getNullableBoolean(issue.is_color);
-          issue.is_owned = this.getNullableBoolean(issue.is_owned);
-          issue.is_read  = this.getNullableBoolean(issue.is_read);
+          issue.is_color = utils.getNullableBoolean(issue.is_color);
+          issue.is_owned = utils.getNullableBoolean(issue.is_owned);
+          issue.is_read  = utils.getNullableBoolean(issue.is_read);
         });
 
         this.setState({
@@ -45,18 +55,6 @@ class App extends React.Component {
         });
       }
     });
-  };
-
-  getNullableBoolean = input => {
-    let output = null;
-
-    if (input === '1') {
-      output = true;
-    } else if (input === '0') {
-      output = false;
-    }
-
-    return output;
   };
 
   handleIssueCheckboxChange = event => {
@@ -76,6 +74,14 @@ class App extends React.Component {
 
     this.setState({issue});
   };
+
+  handleLoginChange = (event) => {
+    let login = this.state.login;
+
+    login[event.target.name] = event.target.value;
+
+    this.setState({login});
+  }
 
   handleSearchChange = event => {
     let search = this.state.search;
@@ -112,12 +118,76 @@ class App extends React.Component {
     });
   };
 
+  signIn = (event) => {
+    event.preventDefault();
+
+    const hash = md5(this.state.login.username + this.state.login.password);
+    const params = {
+      username: this.state.login.username,
+      md5: hash
+    };
+
+    axios.get('https://www.rootbeercomics.com/login/ajax/index.php', {params}).then(response => {
+      if (response.data.success) {
+        const user = {
+          isAdmin: (params.username === 'matt!'),
+          isSignedIn: true,
+          md5: params.md5,
+          name: params.username
+        };
+
+        this.setState({
+          showSignInForm: false,
+          user
+        });
+
+        utils.setCookie('user', JSON.stringify(this.state.user));
+      } else {
+        const input = {
+          username: this.state.login.username,
+          password: ''
+        };
+
+        this.setState({input});
+      }
+    });
+  }
+
+  signOut = () => {
+    const user = {
+      isAdmin: false,
+      isSignedIn: false,
+      md5: '',
+      name: ''
+    };
+
+    axios.get('https://www.rootbeercomics.com/login/ajax/log-out.php').then(response => {
+      this.setState({
+        showAddItemForm: false,
+        user
+      });
+      utils.setCookie('user', '');
+    });
+  }
+
+  toggleShowSignInForm = () => {
+    const showSignInForm = !this.state.showSignInForm;
+
+    this.setState({
+      showSignInForm
+    });
+  }
+
   updateIssue = event => {
     event.preventDefault();
 
     const issues = this.state.issues.slice();
     const data   = {
-      params: this.state.issue
+      params: {
+        username: this.state.user.name,
+        md5:      this.state.user.md5,
+        issue:    this.state.issue
+      }
     };
 
     issues.forEach(issue => {
@@ -141,6 +211,12 @@ class App extends React.Component {
   };
 
   render() {
+    const signInOutButton = (this.state.user.isSignedIn) ? (
+      <i aria-hidden={true} className="fas fa-sign-out-alt csrPointer" onClick={this.signOut}></i>
+    ) : (
+      <i aria-hidden={true} className="fas fa-sign-in-alt csrPointer" onClick={this.toggleShowSignInForm}></i>
+    );
+
     const contributors = this.state.issue && this.state.issue.contributors ? this.state.issue.contributors.map(contributor => {
       return (
         <div key={contributor.id} className="flex mb5 ml10">
@@ -170,12 +246,21 @@ class App extends React.Component {
 
     return (
       <div className="mAuto w600">
-        <div className="flex spaceBetween alignCenter mb5">
+        <div className="flex spaceBetween alignCenter mb5 fs14">
           <div className="flex alignCenter mr10">
             <i aria-hidden={true} className={`mr10 fs14 fas fa-book-open csrPointer`}></i>
             <h1 className="fs14 bold">longbox</h1>
           </div>
+          {signInOutButton}
         </div>
+        {this.state.showSignInForm &&
+          <SignInForm
+          signIn={this.signIn}
+          username={this.state.login.username}
+          password={this.state.login.password}
+          handleLoginChange={this.handleLoginChange}
+          />
+        }
         <section id="search" className="mb5">
           <input
           className="bdrBox bdrBlack p5 wFull"
@@ -312,19 +397,21 @@ class App extends React.Component {
               />
             </div>
             {contributors && (
-              <div className="mb10">
+              <div>
                 <label className="mb5">contributors</label>
                 {contributors}
               </div>
             )}
-            <div className="flex flexEnd">
-              <button
-              className="bdrBlack p5 csrPointer"
-              type="submit"
-              >
-                update
-              </button>
-            </div>
+            {this.state.user.isAdmin && (
+              <div className="flex flexEnd mt10">
+                <button
+                className="bdrBlack p5 csrPointer"
+                type="submit"
+                >
+                  update
+                </button>
+              </div>
+            )}
           </form>
         )}
         {this.state.issue === null && (
@@ -333,7 +420,12 @@ class App extends React.Component {
               this.state.issues.length > 0 ? this.state.issues.map((issue, index) => {
                 return (
                   <div key={index}>
-                    <span onClick={() => {this.setIssue(issue.id)}} className="csrPointer">{index + 1}. {issue.title}{issue.number ? ` #${issue.number}` : ''}</span>
+                    <span
+                    onClick={() => {this.setIssue(issue.id)}}
+                    className="csrPointer"
+                    >
+                      {index + 1}. {issue.title}{issue.number ? ` #${issue.number}` : ''}
+                    </span>
                   </div>
                 );
               }) : (<div>...</div>)
