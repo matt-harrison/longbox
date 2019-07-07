@@ -75,6 +75,18 @@ class App extends React.Component {
     this.setState({issue});
   };
 
+  handleContributorTextChange = (event, id, key) => {
+    const issue = this.state.issue;
+
+    issue['contributors'].forEach((contributor) => {
+      if (contributor.id === id) {
+        contributor[key] = event.target.value;
+      }
+    });
+
+    this.setState({issue});
+  };
+
   handleLoginChange = (event) => {
     let login = this.state.login;
 
@@ -101,7 +113,7 @@ class App extends React.Component {
   };
 
   setIssue = issueId => {
-    let data   = null;
+    let data = null;
 
     if (issueId) {
       this.state.issues.forEach(issue => {
@@ -227,7 +239,7 @@ class App extends React.Component {
             id={`creatorType${contributor.id}`}
             name={`creatorType${contributor.id}`}
             value={contributor.creator_type}
-            onChange={() => {}}
+            onChange={event => {this.handleContributorTextChange(event, contributor.id, 'creator_type')}}
             />
           </div>
           <div className="wFull">
@@ -237,7 +249,7 @@ class App extends React.Component {
             id={`creator${contributor.id}`}
             name={`creator${contributor.id}`}
             value={contributor.creator}
-            onChange={() => {}}
+            onChange={event => {this.handleContributorTextChange(event, contributor.id, 'creator')}}
             />
           </div>
         </div>
