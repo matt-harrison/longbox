@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import md5 from 'md5';
 
+import EditIssueForm from './components/EditIssueForm';
 import SignInForm from './components/SignInForm';
 
 import * as utils from './utils';
@@ -216,6 +217,7 @@ class App extends React.Component {
       if (response) {
         this.setState({
           cancelToken: null,
+          issue: null,
           issues
         });
       }
@@ -229,39 +231,12 @@ class App extends React.Component {
       <i aria-hidden={true} className="fas fa-sign-in-alt csrPointer" onClick={this.toggleShowSignInForm}></i>
     );
 
-    const contributors = this.state.issue && this.state.issue.contributors ? this.state.issue.contributors.map(contributor => {
-      return (
-        <div key={contributor.id} className="flex mb5 ml10">
-          <div className="mr10 w100">
-            <label htmlFor={`creatorType${contributor.id}`}>type</label>
-            <input
-            className="bdrBox bdrBlack p5 wFull"
-            id={`creatorType${contributor.id}`}
-            name={`creatorType${contributor.id}`}
-            value={contributor.creator_type}
-            onChange={event => {this.handleContributorTextChange(event, contributor.id, 'creator_type')}}
-            />
-          </div>
-          <div className="wFull">
-            <label htmlFor={`creator${contributor.id}`}>name</label>
-            <input
-            className="bdrBox bdrBlack p5 wFull"
-            id={`creator${contributor.id}`}
-            name={`creator${contributor.id}`}
-            value={contributor.creator}
-            onChange={event => {this.handleContributorTextChange(event, contributor.id, 'creator')}}
-            />
-          </div>
-        </div>
-      );
-    }) : '';
-
     return (
       <div className="mAuto w600">
         <div className="flex spaceBetween alignCenter mb5 fs14">
           <div className="flex alignCenter mr10">
-            <i aria-hidden={true} className={`mr10 fs14 fas fa-book-open csrPointer`}></i>
-            <h1 className="fs14 bold">longbox</h1>
+            <i aria-hidden={true} className={`mr10 fs14 fas fa-book-open csrPointer`} onClick={() => {window.location.reload()}}></i>
+            <h1 className="fs14 bold csrPointer" onClick={() => {window.location.reload()}}>longbox</h1>
           </div>
           {signInOutButton}
         </div>
@@ -282,149 +257,15 @@ class App extends React.Component {
           value={this.state.search.any}
           />
         </section>
-        <section id="filters" className="mb5">
-          {
-            //toggle title
-            //toggle number
-            //toggle publisher
-            //toggle writer
-            //toggle interior
-            //toggle cover
-            //toggle notes
-            //toggle year
-            //toggle is_read
-            //toggle is_owned
-            //toggle is_color
-            //toggle format
-          }
-        </section>
         {this.state.issue && (
-          <form
-          className="bdrBox mb5 bdrBlack p10"
-          id="issue"
-          onSubmit={this.updateIssue}
-          >
-            <div className="flex spaceBetween">
-              <h2 className="mb10 bold">
-                {this.state.issue.title}
-                {this.state.issue.number && ` #${this.state.issue.number}`}
-              </h2>
-              <span onClick={this.setIssue} className="bold csrPointer">X</span>
-            </div>
-            <div className="flex spaceBetween mb10">
-              <div className="flex">
-                <input
-                checked={this.state.issue.is_read}
-                className="mr5 bdrBlack p5"
-                id="is_read"
-                name="is_read"
-                onChange={this.handleIssueCheckboxChange}
-                type="checkbox"
-                />
-                <label htmlFor="is_read" className={`${this.state.issue.is_read === null ? 'txtRed' : ''}`}>read</label>
-              </div>
-              <div className="flex">
-                <input
-                checked={this.state.issue.is_owned}
-                className="mr5 bdrBlack p5"
-                id="is_owned"
-                name="is_owned"
-                onChange={this.handleIssueCheckboxChange}
-                type="checkbox"
-                />
-                <label htmlFor="is_owned" className={`${this.state.issue.is_owned === null ? 'txtRed' : ''}`}>owned</label>
-              </div>
-              <div className="flex">
-                <input
-                checked={this.state.issue.is_color}
-                className="mr5 bdrBlack p5"
-                id="is_color"
-                name="is_color"
-                onChange={this.handleIssueCheckboxChange}
-                type="checkbox"
-                />
-                <label htmlFor="is_color" className={`${this.state.issue.is_color === null ? 'txtRed' : ''}`}>color</label>
-              </div>
-            </div>
-            <div className="flex mb10">
-              <div className="mr10 wFull">
-                <label htmlFor="title">title</label>
-                <input
-                className="bdrBox bdrBlack p5 wFull"
-                id="title"
-                name="title"
-                onChange={this.handleIssueTextChange}
-                value={this.state.issue.title}
-                />
-              </div>
-              <div className="mb10 w100">
-                <label htmlFor="number">number</label>
-                <input
-                className="bdrBox bdrBlack p5 wFull"
-                id="number"
-                name="number"
-                onChange={this.handleIssueTextChange}
-                value={this.state.issue.number || ''}
-                />
-              </div>
-            </div>
-            <div className="mb10">
-              <label htmlFor="publisher">publisher</label>
-              <input
-              className="bdrBox bdrBlack p5 wFull"
-              id="publisher"
-              name="publisher"
-              onChange={this.handleIssueTextChange}
-              value={this.state.issue.publisher || ''}
-              />
-            </div>
-            <div className="mb10">
-              <label htmlFor="year">year</label>
-              <input
-              className="bdrBox bdrBlack p5 wFull"
-              id="year"
-              name="year"
-              onChange={this.handleIssueTextChange}
-              value={this.state.issue.year || ''}
-              />
-            </div>
-            <div className="mb10">
-              <label htmlFor="format">format</label>
-              <input
-              className="bdrBox bdrBlack p5 wFull"
-              id="format"
-              name="format"
-              onChange={this.handleIssueTextChange}
-              value={this.state.issue.format}
-              />
-            </div>
-            <div className="mb10">
-              <label htmlFor="notes">notes</label>
-              <textarea
-              className="bdrBox bdrBlack p5 wFull"
-              id="notes"
-              name="notes"
-              onChange={this.handleIssueTextChange}
-              value={this.state.issue.notes}
-              />
-            </div>
-            {contributors && (
-              <div>
-                <label className="mb5">contributors</label>
-                {contributors}
-              </div>
-            )}
-            {this.state.user.isAdmin && (
-              <div className="flex flexEnd mt10">
-                <button
-                className="bdrBlack p5 csrPointer"
-                type="submit"
-                >
-                  update
-                </button>
-              </div>
-            )}
-          </form>
+          <EditIssueForm
+          handleIssueCheckboxChange={this.handleIssueCheckboxChange}
+          handleIssueTextChange={this.handleIssueTextChange}
+          issue={this.state.issue}
+          setIssue={this.setIssue}
+          updateIssue={this.updateIssue}
+          user={this.state.user}
+          />
         )}
         {this.state.issue === null && (
           <section id="list" className="bdrBox mb5 bdrBlack p5">
