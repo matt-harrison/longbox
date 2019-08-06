@@ -2,6 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import md5 from 'md5';
 
+import AddIssueForm from './components/AddIssueForm';
 import EditIssueForm from './components/EditIssueForm';
 import SignInForm from './components/SignInForm';
 
@@ -15,15 +16,31 @@ class App extends React.Component {
 
     this.state = {
       cancelToken: null,
-      issues: [],
-      search: {
-        any: ''
-      },
       issue: null,
+      issueDefault: {
+        contributors: [],
+        format: '',
+        is_color: false,
+        is_owned: true,
+        is_read: true,
+        notes: '',
+        number: null,
+        publisher: '',
+        sort_title: '',
+        title: '',
+        year: null
+      },
+      issueNew: null,
+      issues: [],
       login: {
         md5: null,
         username:  null
       },
+      search: {
+        any: ''
+      },
+      showAddIssueForm: false,
+      showEditIssueForm: false,
       showSignInForm: false,
       user: utils.getCookie()
     };
@@ -33,9 +50,38 @@ class App extends React.Component {
     this.getIssues();
   };
 
+  addIssue = event => {
+    event.preventDefault();
+
+    const data   = {
+      params: {
+        username: this.state.user.name,
+        md5:      this.state.user.md5,
+        issue:    this.state.issueNew
+      }
+    };
+
+    if (this.state.cancelToken) {
+      data.cancelToken = this.state.cancelToken.token;
+    }
+
+    axios.get('https://www.rootbeercomics.com/api/longbox/add.php', data).then(response => {
+      if (response) {
+        this.setState({
+          cancelToken: null,
+          issueNew: null,
+          showEditIssueForm: false
+        });
+      }
+    });
+  };
+
   getIssues = () => {
     const data = {
-      params: this.state.search
+      params: {
+        ...this.state.search,
+        order_by: 'sort_title, number'
+      }
     };
 
     if (this.state.cancelToken) {
@@ -58,22 +104,10 @@ class App extends React.Component {
     });
   };
 
-  handleIssueCheckboxChange = event => {
-    const key   = event.target.id;
-    const issue = this.state.issue;
-
-    issue[key] = !issue[key];
-
-    this.setState({issue});
-  };
-
-  handleIssueTextChange = event => {
-    const key   = event.target.id;
-    const issue = this.state.issue;
-
-    issue[key] = event.target.value;
-
-    this.setState({issue});
+  handleAddIssueFormClose = () => {
+    this.setState({
+      showAddIssueForm: false
+    });
   };
 
   handleContributorTextChange = (event, id, key) => {
@@ -84,6 +118,42 @@ class App extends React.Component {
         contributor[key] = event.target.value;
       }
     });
+
+    this.setState({issue});
+  };
+
+  handleIssueCheckboxChange = event => {
+    const key   = event.target.id;
+    const issue = this.state.issue;
+
+    issue[key] = !issue[key];
+
+    this.setState({issue});
+  };
+
+  handleIssueNewCheckboxChange = event => {
+    const key   = event.target.id;
+    const issueNew = this.state.issueNew;
+
+    issueNew[key] = !issueNew[key];
+
+    this.setState({issueNew});
+  };
+
+  handleIssueNewTextChange = event => {
+    const key   = event.target.id;
+    const issueNew = this.state.issueNew;
+
+    issueNew[key] = event.target.value;
+
+    this.setState({issueNew});
+  };
+
+  handleIssueTextChange = event => {
+    const key   = event.target.id;
+    const issue = this.state.issue;
+
+    issue[key] = event.target.value;
 
     this.setState({issue});
   };
@@ -127,7 +197,8 @@ class App extends React.Component {
     }
 
     this.setState({
-      issue: data
+      issue: data,
+      showEditIssueForm: data !== null
     });
   };
 
@@ -176,7 +247,7 @@ class App extends React.Component {
 
     axios.get('https://www.rootbeercomics.com/login/ajax/log-out.php').then(response => {
       this.setState({
-        showAddItemForm: false,
+        issue: null,
         user
       });
       utils.setCookie('user', '');
@@ -189,6 +260,19 @@ class App extends React.Component {
     this.setState({
       showSignInForm
     });
+  }
+
+  toggleShowAddIssueForm = () => {
+    const showAddIssueForm = !this.state.showAddIssueForm;
+    const data = {
+      showAddIssueForm
+    };
+
+    if (this.state.issueNew === null) {
+      data.issueNew = Object.assign({}, this.state.issueDefault);
+    }
+
+    this.setState(data);
   }
 
   updateIssue = event => {
@@ -218,7 +302,8 @@ class App extends React.Component {
         this.setState({
           cancelToken: null,
           issue: null,
-          issues
+          issues,
+          showEditIssueForm: false
         });
       }
     });
@@ -238,7 +323,12 @@ class App extends React.Component {
             <i aria-hidden={true} className={`mr10 fs14 fas fa-book-open csrPointer`} onClick={() => {window.location.reload()}}></i>
             <h1 className="fs14 bold csrPointer" onClick={() => {window.location.reload()}}>longbox</h1>
           </div>
-          {signInOutButton}
+          <div className="flex alignCenter">
+            {this.state.user.isAdmin && (
+              <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} csrPointer`} onClick={this.toggleShowAddIssueForm}></i>
+            )}
+            {signInOutButton}
+          </div>
         </div>
         {this.state.showSignInForm &&
           <SignInForm
@@ -248,26 +338,38 @@ class App extends React.Component {
           handleLoginChange={this.handleLoginChange}
           />
         }
-        <section id="search" className="mb5">
-          <input
-          className="bdrBox bdrBlack p5 wFull"
-          name="any"
-          onChange={this.handleSearchChange}
-          placeholder="search by title, publisher, contributor, or notes"
-          value={this.state.search.any}
+        {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
+          <section id="search" className="mb5">
+            <input
+            className="bdrBox bdrBlack p5 wFull"
+            name="any"
+            onChange={this.handleSearchChange}
+            placeholder="search by title, publisher, contributor, or notes"
+            value={this.state.search.any}
+            />
+          </section>
+        )}
+        {this.state.showAddIssueForm && (
+          <AddIssueForm
+          handleClose={this.handleAddIssueFormClose}
+          handleIssueCheckboxChange={this.handleIssueNewCheckboxChange}
+          handleIssueTextChange={this.handleIssueNewTextChange}
+          issue={this.state.issueNew}
+          addIssue={this.addIssue}
+          user={this.state.user}
           />
-        </section>
-        {this.state.issue && (
+        )}
+        {this.state.showEditIssueForm && (
           <EditIssueForm
+          handleClose={this.setIssue}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
           handleIssueTextChange={this.handleIssueTextChange}
           issue={this.state.issue}
-          setIssue={this.setIssue}
           updateIssue={this.updateIssue}
           user={this.state.user}
           />
         )}
-        {this.state.issue === null && (
+        {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
           <section id="list" className="bdrBox mb5 bdrBlack p5">
             {
               this.state.issues.length > 0 ? this.state.issues.map((issue, index) => {

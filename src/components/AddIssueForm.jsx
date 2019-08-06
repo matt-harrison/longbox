@@ -1,6 +1,6 @@
 import React from 'react';
 
-class EditIssueForm extends React.Component {
+class AddIssueForm extends React.Component {
   render() {
     const contributors = this.props.issue && this.props.issue.contributors ? this.props.issue.contributors.map(contributor => {
       return (
@@ -33,7 +33,7 @@ class EditIssueForm extends React.Component {
       <form
       className="bdrBox mb5 bdrBlack p10"
       id="issue"
-      onSubmit={this.props.updateIssue}
+      onSubmit={this.props.addIssue}
       >
         <div className="flex spaceBetween">
           <h2 className="mb10 bold">
@@ -52,7 +52,7 @@ class EditIssueForm extends React.Component {
             onChange={this.props.handleIssueCheckboxChange}
             type="checkbox"
             />
-            <label htmlFor="is_read" className={`${this.props.issue.is_read === null ? 'txtRed' : ''}`}>read</label>
+            <label htmlFor="is_read">read</label>
           </div>
           <div className="flex">
             <input
@@ -63,7 +63,7 @@ class EditIssueForm extends React.Component {
             onChange={this.props.handleIssueCheckboxChange}
             type="checkbox"
             />
-            <label htmlFor="is_owned" className={`${this.props.issue.is_owned === null ? 'txtRed' : ''}`}>owned</label>
+            <label htmlFor="is_owned">owned</label>
           </div>
           <div className="flex">
             <input
@@ -74,7 +74,7 @@ class EditIssueForm extends React.Component {
             onChange={this.props.handleIssueCheckboxChange}
             type="checkbox"
             />
-            <label htmlFor="is_color" className={`${this.props.issue.is_color === null ? 'txtRed' : ''}`}>color</label>
+            <label htmlFor="is_color">color</label>
           </div>
         </div>
         <div className="flex mb10">
@@ -88,7 +88,7 @@ class EditIssueForm extends React.Component {
             value={this.props.issue.title}
             />
           </div>
-          <div className="mb10 w100">
+          <div className="w100">
             <label htmlFor="number">number</label>
             <input
             className="bdrBox bdrBlack p5 wFull"
@@ -105,7 +105,7 @@ class EditIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="sort_title"
           name="sort_title"
-          readOnly={true}
+          onChange={this.props.handleIssueTextChange}
           value={this.props.issue.sort_title}
           />
         </div>
@@ -161,7 +161,7 @@ class EditIssueForm extends React.Component {
             className="bdrBlack p5 csrPointer"
             type="submit"
             >
-              update
+              add
             </button>
           </div>
         )}
@@ -170,4 +170,4 @@ class EditIssueForm extends React.Component {
   }
 }
 
-export default EditIssueForm;
+export default AddIssueForm;
