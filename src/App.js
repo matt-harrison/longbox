@@ -30,7 +30,6 @@ class App extends React.Component {
         title: '',
         year: null
       },
-      issueNew: null,
       issues: [],
       login: {
         md5: null,
@@ -57,7 +56,7 @@ class App extends React.Component {
       params: {
         username: this.state.user.name,
         md5:      this.state.user.md5,
-        issue:    this.state.issueNew
+        issue:    this.state.issue
       }
     };
 
@@ -69,7 +68,8 @@ class App extends React.Component {
       if (response) {
         this.setState({
           cancelToken: null,
-          issueNew: null,
+          issue: null,
+          showAddIssueForm: false,
           showEditIssueForm: false
         });
       }
@@ -120,6 +120,10 @@ class App extends React.Component {
         }
       });
     } else {
+      if (!issue.contributors[index]) {
+        issue.contributors[index] = {};
+      }
+
       issue.contributors[index][key] = event.target.value;
     }
 
@@ -133,24 +137,6 @@ class App extends React.Component {
     issue[key] = !issue[key];
 
     this.setState({issue});
-  };
-
-  handleIssueNewCheckboxChange = event => {
-    const key   = event.target.id;
-    const issueNew = this.state.issueNew;
-
-    issueNew[key] = !issueNew[key];
-
-    this.setState({issueNew});
-  };
-
-  handleIssueNewTextChange = event => {
-    const key   = event.target.id;
-    const issueNew = this.state.issueNew;
-
-    issueNew[key] = event.target.value;
-
-    this.setState({issueNew});
   };
 
   handleIssueTextChange = event => {
@@ -196,11 +182,13 @@ class App extends React.Component {
         if (issue.id === issueId) {
           data = issue;
 
-          data.contributors.forEach((contributor, index) => {
-            if (contributor.creator_type_id !== '' && contributor.creator !== '') {
-              contributors.push(contributor);
-            }
-          });
+          if (data.contributors) {
+            data.contributors.forEach((contributor, index) => {
+              if (contributor.creator_type_id !== '' && contributor.creator !== '') {
+                contributors.push(contributor);
+              }
+            });
+          }
 
           data.contributors = contributors;
 
@@ -278,11 +266,12 @@ class App extends React.Component {
   toggleShowAddIssueForm = () => {
     const showAddIssueForm = !this.state.showAddIssueForm;
     const data = {
-      showAddIssueForm
+      showAddIssueForm,
+      showEditIssueForm: false
     };
 
-    if (this.state.issueNew === null) {
-      data.issueNew = Object.assign({}, this.state.issueDefault);
+    if (this.state.issue === null) {
+      data.issue = Object.assign({}, this.state.issueDefault);
     }
 
     this.setState(data);
@@ -366,9 +355,9 @@ class App extends React.Component {
           <AddIssueForm
           handleClose={this.handleAddIssueFormClose}
           handleContributorTextChange={this.handleContributorTextChange}
-          handleIssueCheckboxChange={this.handleIssueNewCheckboxChange}
-          handleIssueTextChange={this.handleIssueNewTextChange}
-          issue={this.state.issueNew}
+          handleIssueCheckboxChange={this.handleIssueCheckboxChange}
+          handleIssueTextChange={this.handleIssueTextChange}
+          issue={this.state.issue}
           addIssue={this.addIssue}
           user={this.state.user}
           />

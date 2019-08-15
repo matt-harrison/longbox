@@ -1,28 +1,50 @@
 import React from 'react';
 
 class AddIssueForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      contributors: this.props.issue.contributors
+    };
+  };
+
+  addContributor = () => {
+    let contributors = this.state.contributors;
+
+    contributors.push({
+      creator: '',
+      creator_type: '',
+      id: null
+    });
+
+    this.setState({
+      contributors
+    });
+  };
+
   render() {
-    const contributors = this.props.issue && this.props.issue.contributors ? this.props.issue.contributors.map(contributor => {
+    const contributors = this.state.contributors ? this.state.contributors.map((contributor, index) => {
       return (
-        <div key={contributor.id} className="flex mb5 ml10">
+        <div key={index} className="flex mb10 ml10">
           <div className="mr10 w100">
-            <label htmlFor={`creatorType${contributor.id}`}>type</label>
+            <label htmlFor={`creatorType${index}`}>type</label>
             <input
             className="bdrBox bdrBlack p5 wFull"
-            id={`creatorType${contributor.id}`}
-            name={`creatorType${contributor.id}`}
+            id={`creatorType${index}`}
+            name={`creatorType${index}`}
             value={contributor.creator_type}
-            onChange={event => {this.handleContributorTextChange(event, contributor.id, 'creator_type')}}
+            onChange={event => {this.props.handleContributorTextChange(event, index, contributor, 'creator_type')}}
             />
           </div>
           <div className="wFull">
-            <label htmlFor={`creator${contributor.id}`}>name</label>
+            <label htmlFor={`creator${index}`}>name</label>
             <input
             className="bdrBox bdrBlack p5 wFull"
-            id={`creator${contributor.id}`}
-            name={`creator${contributor.id}`}
+            id={`creator${index}`}
+            name={`creator${index}`}
             value={contributor.creator}
-            onChange={event => {this.handleContributorTextChange(event, contributor.id, 'creator')}}
+            onChange={event => {this.props.handleContributorTextChange(event, index, contributor, 'creator')}}
             />
           </div>
         </div>
@@ -149,19 +171,18 @@ class AddIssueForm extends React.Component {
           value={this.props.issue.notes}
           />
         </div>
-        {contributors && (
-          <div>
-            <label className="mb5">contributors</label>
-            {contributors}
-          </div>
-        )}
+        <div id="contributors">
+          <label>contributors</label>
+          {contributors}
+          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus csrPointer`} onClick={this.addContributor}></i>
+        </div>
         {this.props.user.isAdmin && (
           <div className="flex flexEnd mt10">
             <button
             className="bdrBlack p5 csrPointer"
             type="submit"
             >
-              add
+              add issue(s)
             </button>
           </div>
         )}
