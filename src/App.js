@@ -110,14 +110,18 @@ class App extends React.Component {
     });
   };
 
-  handleContributorTextChange = (event, id, key) => {
+  handleContributorTextChange = (event, index, data, key) => {
     const issue = this.state.issue;
 
-    issue['contributors'].forEach((contributor) => {
-      if (contributor.id === id) {
-        contributor[key] = event.target.value;
-      }
-    });
+    if (data.id) {
+      issue.contributors.forEach(contributor => {
+        if (contributor.id === data.id) {
+          contributor[key] = event.target.value;
+        }
+      });
+    } else {
+      issue.contributors[index][key] = event.target.value;
+    }
 
     this.setState({issue});
   };
@@ -184,12 +188,21 @@ class App extends React.Component {
   };
 
   setIssue = issueId => {
-    let data = null;
+    let data         = null;
+    let contributors = [];
 
     if (issueId) {
       this.state.issues.forEach(issue => {
         if (issue.id === issueId) {
           data = issue;
+
+          data.contributors.forEach((contributor, index) => {
+            if (contributor.creator_type_id !== '' && contributor.creator !== '') {
+              contributors.push(contributor);
+            }
+          });
+
+          data.contributors = contributors;
 
           window.scrollTo(0, 0);
         }
@@ -352,6 +365,7 @@ class App extends React.Component {
         {this.state.showAddIssueForm && (
           <AddIssueForm
           handleClose={this.handleAddIssueFormClose}
+          handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueNewCheckboxChange}
           handleIssueTextChange={this.handleIssueNewTextChange}
           issue={this.state.issueNew}
@@ -362,6 +376,7 @@ class App extends React.Component {
         {this.state.showEditIssueForm && (
           <EditIssueForm
           handleClose={this.setIssue}
+          handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
           handleIssueTextChange={this.handleIssueTextChange}
           issue={this.state.issue}
