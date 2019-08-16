@@ -15,7 +15,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      cancelToken: null,
+      cancelToken: axios.CancelToken.source(),
       issue: null,
       issueDefault: {
         contributors: [],
