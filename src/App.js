@@ -15,6 +15,7 @@ class App extends React.Component {
     super(props);
 
     this.state = {
+      autocomplete: [],
       cancelToken: axios.CancelToken.source(),
       issue: null,
       issueDefault: {
@@ -88,7 +89,7 @@ class App extends React.Component {
       data.cancelToken = this.state.cancelToken.token;
     }
 
-    axios.get('https://www.rootbeercomics.com/api/longbox/get.php', data).then(response => {
+    axios.get('https://www.rootbeercomics.com/api/longbox/issues.php', data).then(response => {
       if (response) {
         response.data.issues.results.forEach(issue => {
           issue.is_color = utils.getNullableBoolean(issue.is_color);
@@ -110,13 +111,14 @@ class App extends React.Component {
     });
   };
 
-  handleContributorTextChange = (event, index, data, key) => {
+  handleContributorTextChange = (event, index, contributorId, key) => {
     const issue = this.state.issue;
+    const value = event.target.value;
 
-    if (data.id) {
+    if (contributorId) {
       issue.contributors.forEach(contributor => {
-        if (contributor.id === data.id) {
-          contributor[key] = event.target.value;
+        if (contributor.id === contributorId) {
+          contributor[key] = value;
         }
       });
     } else {
@@ -124,8 +126,10 @@ class App extends React.Component {
         issue.contributors[index] = {};
       }
 
-      issue.contributors[index][key] = event.target.value;
+      issue.contributors[index][key] = value;
     }
+
+    this.autocomplete(key, value);
 
     this.setState({issue});
   };
@@ -142,10 +146,51 @@ class App extends React.Component {
   handleIssueTextChange = event => {
     const key   = event.target.id;
     const issue = this.state.issue;
+    const value = event.target.value;
 
-    issue[key] = event.target.value;
+    issue[key] = value;
+
+    this.autocomplete(key, value);
 
     this.setState({issue});
+  };
+
+  autocomplete = (key, value) => {
+    let   url  = '';
+    const data = {
+      params: {
+        name: value
+      }
+    };
+
+    switch (key) {
+      case 'creator':
+        url = 'https://www.rootbeercomics.com/api/longbox/creators.php';
+        break;
+      case 'creator_type':
+        url = 'https://www.rootbeercomics.com/api/longbox/creator-types.php';
+        break;
+      case 'format':
+        url = 'https://www.rootbeercomics.com/api/longbox/formats.php';
+        break;
+      case 'publisher':
+        url = 'https://www.rootbeercomics.com/api/longbox/publishers.php';
+        break;
+      case 'title':
+        url = 'https://www.rootbeercomics.com/api/longbox/titles.php';
+        break;
+      default:
+        break;
+    }
+
+    if (url) {
+      axios.get(url, data).then(response => {
+        if (response) {
+          // const results = response.data.results.map(result => result.name);
+          // console.log(results);
+        }
+      });
+    }
   };
 
   handleLoginChange = (event) => {
@@ -270,9 +315,7 @@ class App extends React.Component {
       showEditIssueForm: false
     };
 
-    if (this.state.issue === null) {
-      data.issue = Object.assign({}, this.state.issueDefault);
-    }
+    data.issue = Object.assign({}, this.state.issueDefault);
 
     this.setState(data);
   }

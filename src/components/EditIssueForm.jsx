@@ -34,7 +34,7 @@ class EditIssueForm extends React.Component {
             id={`creatorType${contributor.id}`}
             name={`creatorType${contributor.id}`}
             value={contributor.creator_type}
-            onChange={event => {this.props.handleContributorTextChange(event, index, contributor, 'creator_type')}}
+            onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
             />
           </div>
           <div className="wFull">
@@ -44,7 +44,7 @@ class EditIssueForm extends React.Component {
             id={`creator${contributor.id}`}
             name={`creator${contributor.id}`}
             value={contributor.creator}
-            onChange={event => {this.props.handleContributorTextChange(event, index, contributor, 'creator')}}
+            onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
             />
           </div>
         </div>
