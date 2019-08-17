@@ -6,7 +6,10 @@ class EditIssueForm extends React.Component {
       return (
         <div key={contributor.id} className="flex mb10 ml10">
           <div className="mr10 w100">
-            <label htmlFor={`creatorType${contributor.id}`}>type</label>
+            <div className="flex">
+              <label className="mr5" htmlFor={`creatorType${contributor.id}`}>type</label>
+              <span>[{contributor.creator_type_id}]</span>
+            </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
             id={`creatorType${contributor.id}`}
@@ -16,7 +19,10 @@ class EditIssueForm extends React.Component {
             />
           </div>
           <div className="wFull">
-            <label htmlFor={`creator${contributor.id}`}>name</label>
+            <div className="flex">
+              <label className="mr5" htmlFor={`creator${contributor.id}`}>name</label>
+              <span>[{contributor.creator_id}]</span>
+            </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
             id={`creator${contributor.id}`}
@@ -79,7 +85,10 @@ class EditIssueForm extends React.Component {
         </div>
         <div className="flex mb10">
           <div className="mr10 wFull">
-            <label htmlFor="title">title</label>
+            <div className="flex">
+              <label className="mr5" htmlFor="title">title</label>
+              <span>[{this.props.issue.title_id}]</span>
+            </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
             id="title"
@@ -110,7 +119,10 @@ class EditIssueForm extends React.Component {
           />
         </div>
         <div className="mb10">
-          <label htmlFor="publisher">publisher</label>
+          <div className="flex">
+            <label className="mr5" htmlFor="publisher">publisher</label>
+            <span>[{this.props.issue.publisher_id}]</span>
+          </div>
           <input
           className="bdrBox bdrBlack p5 wFull"
           id="publisher"
@@ -130,7 +142,10 @@ class EditIssueForm extends React.Component {
           />
         </div>
         <div className="mb10">
-          <label htmlFor="format">format</label>
+          <div className="flex">
+            <label className="mr5" htmlFor="format">format</label>
+            <span>[{this.props.issue.format_id}]</span>
+          </div>
           <input
           className="bdrBox bdrBlack p5 wFull"
           id="format"
