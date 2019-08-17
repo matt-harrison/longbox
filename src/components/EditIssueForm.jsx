@@ -1,30 +1,8 @@
 import React from 'react';
 
 class EditIssueForm extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      contributors: this.props.issue.contributors
-    };
-  };
-
-  addContributor = () => {
-    let contributors = this.state.contributors;
-
-    contributors.push({
-      creator: '',
-      creator_type: '',
-      id: null
-    });
-
-    this.setState({
-      contributors
-    });
-  };
-
   render() {
-    const contributors = this.state.contributors ? this.state.contributors.map((contributor, index) => {
+    const contributors = this.props.issue.contributors ? this.props.issue.contributors.map((contributor, index) => {
       return (
         <div key={contributor.id} className="flex mb10 ml10">
           <div className="mr10 w100">
@@ -174,7 +152,7 @@ class EditIssueForm extends React.Component {
         <div>
           <label>contributors</label>
           {contributors}
-          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus csrPointer`} onClick={this.addContributor}></i>
+          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus csrPointer`} onClick={this.props.addContributor}></i>
         </div>
         {this.props.user.isAdmin && (
           <div className="flex flexEnd mt10">
