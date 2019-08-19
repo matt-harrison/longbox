@@ -1,34 +1,15 @@
 import React from 'react';
 
 class EditIssueForm extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      contributors: this.props.issue.contributors
-    };
-  };
-
-  addContributor = () => {
-    let contributors = this.state.contributors;
-
-    contributors.push({
-      creator: '',
-      creator_type: '',
-      id: null
-    });
-
-    this.setState({
-      contributors
-    });
-  };
-
   render() {
-    const contributors = this.state.contributors ? this.state.contributors.map((contributor, index) => {
+    const contributors = this.props.issue.contributors ? this.props.issue.contributors.map((contributor, index) => {
       return (
         <div key={contributor.id} className="flex mb10 ml10">
           <div className="mr10 w100">
-            <label htmlFor={`creatorType${contributor.id}`}>type</label>
+            <div className="flex">
+              <label className="mr5" htmlFor={`creatorType${contributor.id}`}>type</label>
+              <span>[{contributor.creator_type_id}]</span>
+            </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
             id={`creatorType${contributor.id}`}
@@ -38,7 +19,10 @@ class EditIssueForm extends React.Component {
             />
           </div>
           <div className="wFull">
-            <label htmlFor={`creator${contributor.id}`}>name</label>
+            <div className="flex">
+              <label className="mr5" htmlFor={`creator${contributor.id}`}>name</label>
+              <span>[{contributor.creator_id}]</span>
+            </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
             id={`creator${contributor.id}`}
@@ -101,7 +85,10 @@ class EditIssueForm extends React.Component {
         </div>
         <div className="flex mb10">
           <div className="mr10 wFull">
-            <label htmlFor="title">title</label>
+            <div className="flex">
+              <label className="mr5" htmlFor="title">title</label>
+              <span>[{this.props.issue.title_id}]</span>
+            </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
             id="title"
@@ -132,7 +119,10 @@ class EditIssueForm extends React.Component {
           />
         </div>
         <div className="mb10">
-          <label htmlFor="publisher">publisher</label>
+          <div className="flex">
+            <label className="mr5" htmlFor="publisher">publisher</label>
+            <span>[{this.props.issue.publisher_id}]</span>
+          </div>
           <input
           className="bdrBox bdrBlack p5 wFull"
           id="publisher"
@@ -152,7 +142,10 @@ class EditIssueForm extends React.Component {
           />
         </div>
         <div className="mb10">
-          <label htmlFor="format">format</label>
+          <div className="flex">
+            <label className="mr5" htmlFor="format">format</label>
+            <span>[{this.props.issue.format_id}]</span>
+          </div>
           <input
           className="bdrBox bdrBlack p5 wFull"
           id="format"
@@ -174,7 +167,7 @@ class EditIssueForm extends React.Component {
         <div>
           <label>contributors</label>
           {contributors}
-          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus csrPointer`} onClick={this.addContributor}></i>
+          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus csrPointer`} onClick={this.props.addContributor}></i>
         </div>
         {this.props.user.isAdmin && (
           <div className="flex flexEnd mt10">

@@ -51,6 +51,18 @@ class App extends React.Component {
     this.getIssues();
   };
 
+  addContributor = () => {
+    let issue = this.state.issue;
+
+    issue.contributors.push({
+      creator: '',
+      creator_type: '',
+      id: null
+    });
+
+    this.setState({issue});
+  };
+
   addIssue = event => {
     event.preventDefault();
 
@@ -76,6 +88,44 @@ class App extends React.Component {
         });
       }
     });
+  };
+
+  autocomplete = (key, value) => {
+    let   url  = '';
+    const data = {
+      params: {
+        name: value
+      }
+    };
+
+    switch (key) {
+      case 'creator':
+        url = 'https://www.rootbeercomics.com/api/longbox/creators.php';
+        break;
+      case 'creator_type':
+        url = 'https://www.rootbeercomics.com/api/longbox/creator-types.php';
+        break;
+      case 'format':
+        url = 'https://www.rootbeercomics.com/api/longbox/formats.php';
+        break;
+      case 'publisher':
+        url = 'https://www.rootbeercomics.com/api/longbox/publishers.php';
+        break;
+      case 'title':
+        url = 'https://www.rootbeercomics.com/api/longbox/titles.php';
+        break;
+      default:
+        break;
+    }
+
+    if (url) {
+      axios.get(url, data).then(response => {
+        if (response) {
+          // const results = response.data.results.map(result => result.name);
+          // console.log(results);
+        }
+      });
+    }
   };
 
   getIssues = () => {
@@ -154,44 +204,6 @@ class App extends React.Component {
     this.autocomplete(key, value);
 
     this.setState({issue});
-  };
-
-  autocomplete = (key, value) => {
-    let   url  = '';
-    const data = {
-      params: {
-        name: value
-      }
-    };
-
-    switch (key) {
-      case 'creator':
-        url = 'https://www.rootbeercomics.com/api/longbox/creators.php';
-        break;
-      case 'creator_type':
-        url = 'https://www.rootbeercomics.com/api/longbox/creator-types.php';
-        break;
-      case 'format':
-        url = 'https://www.rootbeercomics.com/api/longbox/formats.php';
-        break;
-      case 'publisher':
-        url = 'https://www.rootbeercomics.com/api/longbox/publishers.php';
-        break;
-      case 'title':
-        url = 'https://www.rootbeercomics.com/api/longbox/titles.php';
-        break;
-      default:
-        break;
-    }
-
-    if (url) {
-      axios.get(url, data).then(response => {
-        if (response) {
-          // const results = response.data.results.map(result => result.name);
-          // console.log(results);
-        }
-      });
-    }
   };
 
   handleLoginChange = (event) => {
@@ -313,14 +325,12 @@ class App extends React.Component {
 
   toggleShowAddIssueForm = () => {
     const showAddIssueForm = !this.state.showAddIssueForm;
-    const data = {
+
+    this.setState({
+      issue: JSON.parse(JSON.stringify(this.state.issueDefault)),
       showAddIssueForm,
       showEditIssueForm: false
-    };
-
-    data.issue = Object.assign({}, this.state.issueDefault);
-
-    this.setState(data);
+    });
   }
 
   updateIssue = event => {
@@ -399,6 +409,7 @@ class App extends React.Component {
         )}
         {this.state.showAddIssueForm && (
           <AddIssueForm
+          addContributor={this.addContributor}
           handleClose={this.handleAddIssueFormClose}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
@@ -410,6 +421,7 @@ class App extends React.Component {
         )}
         {this.state.showEditIssueForm && (
           <EditIssueForm
+          addContributor={this.addContributor}
           handleClose={this.setIssue}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
