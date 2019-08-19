@@ -74,14 +74,9 @@ class App extends React.Component {
       }
     };
 
-    if (this.state.cancelToken) {
-      data.cancelToken = this.state.cancelToken.token;
-    }
-
     axios.get('https://www.rootbeercomics.com/api/longbox/add.php', data).then(response => {
       if (response) {
         this.setState({
-          cancelToken: null,
           issue: null,
           showAddIssueForm: false,
           showEditIssueForm: false
@@ -90,42 +85,58 @@ class App extends React.Component {
     });
   };
 
-  autocomplete = (key, value) => {
-    let   url  = '';
-    const data = {
-      params: {
-        name: value
-      }
-    };
+  autocomplete = async (key, value) => {
+    let autocompleteData = [];
 
-    switch (key) {
-      case 'creator':
-        url = 'https://www.rootbeercomics.com/api/longbox/creators.php';
-        break;
-      case 'creator_type':
-        url = 'https://www.rootbeercomics.com/api/longbox/creator-types.php';
-        break;
-      case 'format':
-        url = 'https://www.rootbeercomics.com/api/longbox/formats.php';
-        break;
-      case 'publisher':
-        url = 'https://www.rootbeercomics.com/api/longbox/publishers.php';
-        break;
-      case 'title':
-        url = 'https://www.rootbeercomics.com/api/longbox/titles.php';
-        break;
-      default:
-        break;
-    }
-
-    if (url) {
-      axios.get(url, data).then(response => {
-        if (response) {
-          // const results = response.data.results.map(result => result.name);
-          // console.log(results);
+    if (value !== '') {
+      const data = {
+        params: {
+          name: value
         }
-      });
+      };
+      let url = '';
+
+      switch (key) {
+        case 'creator':
+          url = 'https://www.rootbeercomics.com/api/longbox/creators.php';
+          break;
+        case 'creator_type':
+          url = 'https://www.rootbeercomics.com/api/longbox/creator-types.php';
+          break;
+        case 'format':
+          url = 'https://www.rootbeercomics.com/api/longbox/formats.php';
+          break;
+        case 'publisher':
+          url = 'https://www.rootbeercomics.com/api/longbox/publishers.php';
+          break;
+        case 'title':
+          url = 'https://www.rootbeercomics.com/api/longbox/titles.php';
+          break;
+        default:
+          break;
+      }
+
+      if (url) {
+        if (this.state.cancelToken) {
+          data.cancelToken = this.state.cancelToken.token;
+        }
+
+        autocompleteData = await axios.get(url, data).then(response => {
+          let results = [];
+
+          if (response) {
+            results = response.data.results.map(result => result.name);
+          }
+
+          return results;
+        });
+      }
     }
+
+    this.setState({
+      autocomplete: autocompleteData,
+      cancelToken: null
+    });
   };
 
   getIssues = () => {
@@ -180,9 +191,16 @@ class App extends React.Component {
       issue.contributors[index][key] = value;
     }
 
-    this.autocomplete(key, value);
+    if (this.state.cancelToken) {
+      this.state.cancelToken.cancel();
+    }
 
-    this.setState({issue});
+    this.setState({
+      cancelToken: axios.CancelToken.source(),
+      issue
+    }, () => {
+      this.autocomplete(key, value);
+    });
   };
 
   handleIssueCheckboxChange = event => {
@@ -194,16 +212,27 @@ class App extends React.Component {
     this.setState({issue});
   };
 
-  handleIssueTextChange = event => {
-    const key   = event.target.id;
+  handleIssueTextChange = async event => {
     const issue = this.state.issue;
+    const key   = event.target.id;
     const value = event.target.value;
 
     issue[key] = value;
 
-    this.autocomplete(key, value);
+    if (key === 'title') {
+      issue.sort_title = value;
+    }
 
-    this.setState({issue});
+    if (this.state.cancelToken) {
+      this.state.cancelToken.cancel();
+    }
+
+    this.setState({
+      cancelToken: axios.CancelToken.source(),
+      issue
+    }, () => {
+      this.autocomplete(key, value);
+    });
   };
 
   handleLoginChange = (event) => {
@@ -351,14 +380,9 @@ class App extends React.Component {
       }
     });
 
-    if (this.state.cancelToken) {
-      data.cancelToken = this.state.cancelToken.token;
-    }
-
     axios.get('https://www.rootbeercomics.com/api/longbox/update.php', data).then(response => {
       if (response) {
         this.setState({
-          cancelToken: null,
           issue: null,
           issues,
           showEditIssueForm: false
