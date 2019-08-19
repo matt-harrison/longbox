@@ -91,7 +91,8 @@ class App extends React.Component {
     let autocomplete = [];
     const data = {
       params: {
-        name: value
+        name: value,
+        order_by: 'name'
       }
     };
     const rectangle = document.querySelector(`[id="${key + index}"]`).getBoundingClientRect();
