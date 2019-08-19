@@ -6,13 +6,15 @@ class AddIssueForm extends React.Component {
       return (
         <div key={index} className="flex mb10 ml10">
           <div className="mr10 w100">
-            <label htmlFor={`creatorType${index}`}>type</label>
+            <label htmlFor={`creator_type${index}`}>type</label>
             <input
             className="bdrBox bdrBlack p5 wFull"
-            id={`creatorType${index}`}
-            name={`creatorType${index}`}
+            id={`creator_type${index}`}
+            name={`creator_type${index}`}
             value={contributor.creator_type}
+            onBlur={this.props.handleIssueTextBlur}
             onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
+            onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
             />
           </div>
           <div className="wFull">
@@ -22,7 +24,9 @@ class AddIssueForm extends React.Component {
             id={`creator${index}`}
             name={`creator${index}`}
             value={contributor.creator}
+            onBlur={this.props.handleIssueTextBlur}
             onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
+            onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
             />
           </div>
         </div>
@@ -84,7 +88,9 @@ class AddIssueForm extends React.Component {
             className="bdrBox bdrBlack p5 wFull"
             id="title"
             name="title"
+            onBlur={this.props.handleIssueTextBlur}
             onChange={this.props.handleIssueTextChange}
+            onFocus={this.props.handleIssueTextChange}
             value={this.props.issue.title}
             />
           </div>
@@ -94,7 +100,9 @@ class AddIssueForm extends React.Component {
             className="bdrBox bdrBlack p5 wFull"
             id="number"
             name="number"
+            onBlur={this.props.handleIssueTextBlur}
             onChange={this.props.handleIssueTextChange}
+            onFocus={this.props.handleIssueTextChange}
             value={this.props.issue.number || ''}
             />
           </div>
@@ -105,7 +113,9 @@ class AddIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="sort_title"
           name="sort_title"
+          onBlur={this.props.handleIssueTextBlur}
           onChange={this.props.handleIssueTextChange}
+          onFocus={this.props.handleIssueTextChange}
           value={this.props.issue.sort_title}
           />
         </div>
@@ -115,7 +125,9 @@ class AddIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="publisher"
           name="publisher"
+          onBlur={this.props.handleIssueTextBlur}
           onChange={this.props.handleIssueTextChange}
+          onFocus={this.props.handleIssueTextChange}
           value={this.props.issue.publisher || ''}
           />
         </div>
@@ -135,7 +147,9 @@ class AddIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="format"
           name="format"
+          onBlur={this.props.handleIssueTextBlur}
           onChange={this.props.handleIssueTextChange}
+          onFocus={this.props.handleIssueTextChange}
           value={this.props.issue.format}
           />
         </div>

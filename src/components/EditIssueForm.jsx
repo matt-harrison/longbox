@@ -7,28 +7,32 @@ class EditIssueForm extends React.Component {
         <div key={contributor.id} className="flex mb10 ml10">
           <div className="mr10 w100">
             <div className="flex">
-              <label className="mr5" htmlFor={`creatorType${contributor.id}`}>type</label>
+              <label className="mr5" htmlFor={`creator_type${index}`}>type</label>
               <span>[{contributor.creator_type_id}]</span>
             </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
-            id={`creatorType${contributor.id}`}
-            name={`creatorType${contributor.id}`}
+            id={`creator_type${index}`}
+            name={`creator_type${index}`}
             value={contributor.creator_type}
+            onBlur={this.props.handleIssueTextBlur}
             onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
+            onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
             />
           </div>
           <div className="wFull">
             <div className="flex">
-              <label className="mr5" htmlFor={`creator${contributor.id}`}>name</label>
+              <label className="mr5" htmlFor={`creator${index}`}>name</label>
               <span>[{contributor.creator_id}]</span>
             </div>
             <input
             className="bdrBox bdrBlack p5 wFull"
-            id={`creator${contributor.id}`}
-            name={`creator${contributor.id}`}
+            id={`creator${index}`}
+            name={`creator${index}`}
             value={contributor.creator}
+            onBlur={this.props.handleIssueTextBlur}
             onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
+            onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
             />
           </div>
         </div>
@@ -93,7 +97,9 @@ class EditIssueForm extends React.Component {
             className="bdrBox bdrBlack p5 wFull"
             id="title"
             name="title"
+            onBlur={this.props.handleIssueTextBlur}
             onChange={this.props.handleIssueTextChange}
+            onFocus={this.props.handleIssueTextChange}
             value={this.props.issue.title}
             />
           </div>
@@ -103,6 +109,7 @@ class EditIssueForm extends React.Component {
             className="bdrBox bdrBlack p5 wFull"
             id="number"
             name="number"
+            onBlur={this.props.handleIssueTextBlur}
             onChange={this.props.handleIssueTextChange}
             value={this.props.issue.number || ''}
             />
@@ -127,7 +134,9 @@ class EditIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="publisher"
           name="publisher"
+          onBlur={this.props.handleIssueTextBlur}
           onChange={this.props.handleIssueTextChange}
+          onFocus={this.props.handleIssueTextChange}
           value={this.props.issue.publisher || ''}
           />
         </div>
@@ -150,7 +159,9 @@ class EditIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="format"
           name="format"
+          onBlur={this.props.handleIssueTextBlur}
           onChange={this.props.handleIssueTextChange}
+          onFocus={this.props.handleIssueTextChange}
           value={this.props.issue.format}
           />
         </div>

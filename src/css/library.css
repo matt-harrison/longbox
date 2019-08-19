@@ -23,6 +23,8 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 .absolute {position: absolute;}
 .relative {position: relative;}
 
+.hidden {visibility: hidden;}
+
 .overflow-hidden {overflow: hidden;}
 
 .flex {display: flex;}
@@ -100,6 +102,12 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 #addItemButton {
   min-height: 65px;
+}
+
+.suggestion:hover {
+  background-color: gray;
+  color: white;
+  cursor: pointer;
 }
 
 @media only screen and (max-width: 600px) {

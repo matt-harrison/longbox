@@ -16,6 +16,8 @@ class App extends React.Component {
 
     this.state = {
       autocomplete: [],
+      autocompleteIndex: null,
+      autocompleteKey: null,
       cancelToken: axios.CancelToken.source(),
       issue: null,
       issueDefault: {
@@ -85,58 +87,57 @@ class App extends React.Component {
     });
   };
 
-  autocomplete = async (key, value) => {
-    let autocompleteData = [];
-
-    if (value !== '') {
-      const data = {
-        params: {
-          name: value
-        }
-      };
-      let url = '';
-
-      switch (key) {
-        case 'creator':
-          url = 'https://www.rootbeercomics.com/api/longbox/creators.php';
-          break;
-        case 'creator_type':
-          url = 'https://www.rootbeercomics.com/api/longbox/creator-types.php';
-          break;
-        case 'format':
-          url = 'https://www.rootbeercomics.com/api/longbox/formats.php';
-          break;
-        case 'publisher':
-          url = 'https://www.rootbeercomics.com/api/longbox/publishers.php';
-          break;
-        case 'title':
-          url = 'https://www.rootbeercomics.com/api/longbox/titles.php';
-          break;
-        default:
-          break;
+  autocomplete = async (key, value, index = '') => {
+    let autocomplete = [];
+    const data = {
+      params: {
+        name: value
       }
+    };
+    const rectangle = document.querySelector(`[id="${key + index}"]`).getBoundingClientRect();
+    let url = '';
 
-      if (url) {
-        if (this.state.cancelToken) {
-          data.cancelToken = this.state.cancelToken.token;
-        }
+    document.querySelector('#autocomplete').style.left  = rectangle.left + 'px';
+    document.querySelector('#autocomplete').style.top   = (rectangle.top + rectangle.height - 1) + 'px';
+    document.querySelector('#autocomplete').style.width = (rectangle.width - 2) + 'px';
 
-        autocompleteData = await axios.get(url, data).then(response => {
-          let results = [];
-
-          if (response) {
-            results = response.data.results.map(result => result.name);
-          }
-
-          return results;
-        });
-      }
+    switch (key) {
+      case 'creator':
+        url = 'https://www.rootbeercomics.com/api/longbox/creators.php';
+        break;
+      case 'creator_type':
+        url = 'https://www.rootbeercomics.com/api/longbox/creator-types.php';
+        break;
+      case 'format':
+        url = 'https://www.rootbeercomics.com/api/longbox/formats.php';
+        break;
+      case 'publisher':
+        url = 'https://www.rootbeercomics.com/api/longbox/publishers.php';
+        break;
+      case 'title':
+        url = 'https://www.rootbeercomics.com/api/longbox/titles.php';
+        break;
+      default:
+        break;
     }
 
-    this.setState({
-      autocomplete: autocompleteData,
-      cancelToken: null
-    });
+    if (url) {
+      if (this.state.cancelToken) {
+        data.cancelToken = this.state.cancelToken.token;
+      }
+
+      autocomplete = await axios.get(url, data).then(response => {
+        let results = [];
+
+        if (response) {
+          results = response.data.results.map(result => result.name);
+        }
+
+        return results;
+      });
+    }
+
+    return autocomplete.slice(0, 5);
   };
 
   getIssues = () => {
@@ -174,8 +175,9 @@ class App extends React.Component {
   };
 
   handleContributorTextChange = (event, index, contributorId, key) => {
-    const issue = this.state.issue;
-    const value = event.target.value;
+    let   autocomplete = [];
+    const issue        = this.state.issue;
+    const value        = event.target.value;
 
     if (contributorId) {
       issue.contributors.forEach(contributor => {
@@ -198,8 +200,15 @@ class App extends React.Component {
     this.setState({
       cancelToken: axios.CancelToken.source(),
       issue
-    }, () => {
-      this.autocomplete(key, value);
+    }, async () => {
+      autocomplete = await this.autocomplete(key, value, index);
+
+      this.setState({
+        autocomplete,
+        autocompleteKey: key,
+        autocompleteIndex: index,
+        cancelToken: null
+      });
     });
   };
 
@@ -212,10 +221,21 @@ class App extends React.Component {
     this.setState({issue});
   };
 
+  handleIssueTextBlur = () => {
+    setTimeout(() => {
+      this.setState({
+        autocomplete: [],
+        autocompleteIndex: null,
+        autocompleteKey: null
+      });
+    }, 250);
+  }
+
   handleIssueTextChange = async event => {
-    const issue = this.state.issue;
-    const key   = event.target.id;
-    const value = event.target.value;
+    let   autocomplete = [];
+    const issue        = this.state.issue;
+    const key          = event.target.id;
+    const value        = event.target.value;
 
     issue[key] = value;
 
@@ -230,8 +250,15 @@ class App extends React.Component {
     this.setState({
       cancelToken: axios.CancelToken.source(),
       issue
-    }, () => {
-      this.autocomplete(key, value);
+    }, async () => {
+      autocomplete = await this.autocomplete(key, value);
+
+      this.setState({
+        autocomplete,
+        autocompleteIndex: null,
+        autocompleteKey: key,
+        cancelToken: null
+      });
     });
   };
 
@@ -257,6 +284,27 @@ class App extends React.Component {
       search
     }, () => {
       this.getIssues();
+    });
+  };
+
+  handleSuggestionClick = event => {
+    const issue = this.state.issue;
+
+    if (this.state.autocompleteIndex !== null) {
+      issue.contributors[this.state.autocompleteIndex][this.state.autocompleteKey] = event.target.innerHTML;
+    } else {
+      issue[this.state.autocompleteKey] = event.target.innerHTML;
+    }
+
+    if (this.state.autocompleteKey === 'title') {
+      issue.sort_title = event.target.innerHTML;
+    }
+
+    this.setState({
+      autocomplete: [],
+      autocompleteIndex: null,
+      autocompleteKey: null,
+      issue
     });
   };
 
@@ -437,6 +485,7 @@ class App extends React.Component {
           handleClose={this.handleAddIssueFormClose}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
+          handleIssueTextBlur={this.handleIssueTextBlur}
           handleIssueTextChange={this.handleIssueTextChange}
           issue={this.state.issue}
           addIssue={this.addIssue}
@@ -449,6 +498,7 @@ class App extends React.Component {
           handleClose={this.setIssue}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
+          handleIssueTextBlur={this.handleIssueTextBlur}
           handleIssueTextChange={this.handleIssueTextChange}
           issue={this.state.issue}
           updateIssue={this.updateIssue}
@@ -473,6 +523,22 @@ class App extends React.Component {
             }
           </section>
         )}
+        <div
+        className={`absolute bdrBlack bgWhite overflow-hidden ${this.state.autocomplete.length > 0 ? '' : 'hidden'}`}
+        id="autocomplete"
+        >
+          {this.state.autocomplete.map((suggestion, index) => {
+            return (
+              <div
+              className="suggestion p5"
+              key={index}
+              onClick={this.handleSuggestionClick}
+              >
+                {suggestion}
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   };
