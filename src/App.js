@@ -33,8 +33,9 @@ class App extends React.Component {
       },
       issues: [],
       login: {
-        md5: null,
-        username:  null
+        md5: '',
+        password: '',
+        username:  ''
       },
       search: {
         any: ''
@@ -251,36 +252,38 @@ class App extends React.Component {
   signIn = (event) => {
     event.preventDefault();
 
-    const hash = md5(this.state.login.username + this.state.login.password);
-    const params = {
-      username: this.state.login.username,
-      md5: hash
-    };
+    if (this.state.login.username !== '' && this.state.login.password !== '') {
+      const hash = md5(this.state.login.username + this.state.login.password);
+      const params = {
+        username: this.state.login.username,
+        md5: hash
+      };
 
-    axios.get('https://www.rootbeercomics.com/login/ajax/index.php', {params}).then(response => {
-      if (response.data.success) {
-        const user = {
-          isAdmin: (params.username === 'matt!'),
-          isSignedIn: true,
-          md5: params.md5,
-          name: params.username
-        };
+      axios.get('https://www.rootbeercomics.com/login/ajax/index.php', {params}).then(response => {
+        if (response.data.success) {
+          const user = {
+            isAdmin: (params.username === 'matt!'),
+            isSignedIn: true,
+            md5: params.md5,
+            name: params.username
+          };
 
-        this.setState({
-          showSignInForm: false,
-          user
-        });
+          this.setState({
+            showSignInForm: false,
+            user
+          });
 
-        utils.setCookie('user', JSON.stringify(this.state.user));
-      } else {
-        const input = {
-          username: this.state.login.username,
-          password: ''
-        };
+          utils.setCookie('user', JSON.stringify(this.state.user));
+        } else {
+          const input = {
+            username: this.state.login.username,
+            password: ''
+          };
 
-        this.setState({input});
-      }
-    });
+          this.setState({input});
+        }
+      });
+    }
   }
 
   signOut = () => {
@@ -377,10 +380,10 @@ class App extends React.Component {
         </div>
         {this.state.showSignInForm &&
           <SignInForm
+          handleLoginChange={this.handleLoginChange}
+          password={this.state.login.password}
           signIn={this.signIn}
           username={this.state.login.username}
-          password={this.state.login.password}
-          handleLoginChange={this.handleLoginChange}
           />
         }
         {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
