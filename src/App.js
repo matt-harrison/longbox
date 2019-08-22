@@ -82,6 +82,8 @@ class App extends React.Component {
           issue: null,
           showAddIssueForm: false,
           showEditIssueForm: false
+        }, () => {
+          this.getIssues();
         });
       }
     });
@@ -99,7 +101,7 @@ class App extends React.Component {
     let url = '';
 
     document.querySelector('#autocomplete').style.left  = rectangle.left + 'px';
-    document.querySelector('#autocomplete').style.top   = (rectangle.top + rectangle.height - 1) + 'px';
+    document.querySelector('#autocomplete').style.top   = (window.scrollY + rectangle.top + rectangle.height - 1) + 'px';
     document.querySelector('#autocomplete').style.width = (rectangle.width - 2) + 'px';
 
     switch (key) {
