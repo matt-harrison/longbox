@@ -12,7 +12,7 @@ class AddIssueForm extends React.Component {
             id={`creator_type${index}`}
             name={`creator_type${index}`}
             value={contributor.creator_type}
-            onBlur={this.props.handleIssueTextBlur}
+            onBlur={this.props.handleContributorTextBlur}
             onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
             onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
             />
@@ -24,7 +24,7 @@ class AddIssueForm extends React.Component {
             id={`creator${index}`}
             name={`creator${index}`}
             value={contributor.creator}
-            onBlur={this.props.handleIssueTextBlur}
+            onBlur={this.props.handleContributorTextBlur}
             onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
             onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
             />

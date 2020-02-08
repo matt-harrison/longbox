@@ -215,9 +215,28 @@ class App extends React.Component {
     });
   };
 
+  handleContributorTextBlur = () => {
+    const state = {
+      autocomplete: [],
+      autocompleteIndex: null,
+      autocompleteKey: null
+    };
+
+    if (this.state.autocomplete.length === 1) {
+      const issue = Object.assign({}, this.state.issue);
+
+      issue.contributors[this.state.autocompleteIndex][this.state.autocompleteKey] = this.state.autocomplete[0];
+      state.issue = issue;
+    }
+
+    setTimeout(() => {
+      this.setState(state);
+    }, 250);
+  }
+
   handleIssueCheckboxChange = event => {
     const key   = event.target.id;
-    const issue = this.state.issue;
+    const issue = Object.assign({}, this.state.issue);
 
     issue[key] = !issue[key];
 
@@ -225,12 +244,21 @@ class App extends React.Component {
   };
 
   handleIssueTextBlur = () => {
+    const state = {
+      autocomplete: [],
+      autocompleteIndex: null,
+      autocompleteKey: null
+    };
+
+    if (this.state.autocomplete.length === 1) {
+      const issue = Object.assign({}, this.state.issue);
+
+      issue[this.state.autocompleteKey] = this.state.autocomplete[0];
+      state.issue = issue;
+    }
+
     setTimeout(() => {
-      this.setState({
-        autocomplete: [],
-        autocompleteIndex: null,
-        autocompleteKey: null
-      });
+      this.setState(state);
     }, 250);
   }
 
@@ -486,6 +514,7 @@ class App extends React.Component {
           <AddIssueForm
           addContributor={this.addContributor}
           handleClose={this.handleAddIssueFormClose}
+          handleContributorTextBlur={this.handleContributorTextBlur}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
           handleIssueTextBlur={this.handleIssueTextBlur}
@@ -499,6 +528,7 @@ class App extends React.Component {
           <EditIssueForm
           addContributor={this.addContributor}
           handleClose={this.setIssue}
+          handleContributorTextBlur={this.handleContributorTextBlur}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
           handleIssueTextBlur={this.handleIssueTextBlur}
