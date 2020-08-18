@@ -8,7 +8,7 @@ import SignInForm from './components/SignInForm';
 
 import * as utils from './utils';
 
-import('./css/library.css');
+import './css/library.css';
 
 class App extends React.Component {
   constructor(props) {
@@ -137,10 +137,10 @@ class App extends React.Component {
         }
 
         return results;
-      });
+      }).catch(error => {});
     }
 
-    return autocomplete.slice(0, 5);
+    return autocomplete ? autocomplete.slice(0, 5) : [];
   };
 
   getIssues = () => {
@@ -168,7 +168,7 @@ class App extends React.Component {
           issues: response.data.issues.results
         });
       }
-    });
+    }).catch(error => {});
   };
 
   handleAddIssueFormClose = () => {
@@ -402,7 +402,7 @@ class App extends React.Component {
 
           this.setState({input});
         }
-      });
+      }).catch();
     }
   }
 
