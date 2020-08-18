@@ -21,11 +21,22 @@ class App extends React.Component {
       cancelToken: axios.CancelToken.source(),
       issue: null,
       issueDefault: {
-        contributors: [],
-        format: '',
-        is_color: false,
+        contributors: [
+          {
+            creator: '',
+            creator_type: 'writer',
+            id: null
+          },
+          {
+            creator: '',
+            creator_type: 'artist',
+            id: null
+          }
+        ],
+        format: 'comic',
+        is_color: true,
         is_owned: true,
-        is_read: true,
+        is_read: false,
         notes: '',
         number: null,
         publisher: '',
