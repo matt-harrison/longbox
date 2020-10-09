@@ -482,6 +482,7 @@ class App extends React.Component {
   };
 
   render() {
+    const digits = this.state.issues.length.toString().length;
     const signInOutButton = (this.state.user.isSignedIn) ? (
       <i aria-hidden={true} className="fas fa-sign-out-alt csrPointer" onClick={this.signOut}></i>
     ) : (
@@ -551,20 +552,20 @@ class App extends React.Component {
         )}
         {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
           <section id="list" className="bdrBox mb5 bdrBlack p5">
-            {
-              this.state.issues.length > 0 ? this.state.issues.map((issue, index) => {
-                return (
-                  <div key={index}>
-                    <span
-                    onClick={() => {this.setIssue(issue.id)}}
-                    className="csrPointer"
-                    >
-                      {index + 1}. {issue.title}{issue.number ? ` #${issue.number}` : ''}
-                    </span>
-                  </div>
-                );
-              }) : (<div>...</div>)
-            }
+            {this.state.issues.length > 0 ? this.state.issues.map((issue, index) => {
+              const id = (index + 1).toString().padStart(digits, '\xa0');
+
+              return (
+                <div key={index}>
+                  <span
+                  onClick={() => {this.setIssue(issue.id)}}
+                  className="csrPointer"
+                  >
+                    {id}. {issue.title}{issue.number ? ` #${issue.number}` : ''}
+                  </span>
+                </div>
+              );
+            }) : (<div>...</div>)}
           </section>
         )}
         <div
