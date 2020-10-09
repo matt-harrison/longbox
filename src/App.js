@@ -261,13 +261,6 @@ class App extends React.Component {
       autocompleteKey: null
     };
 
-    if (this.state.autocomplete.length === 1) {
-      const issue = Object.assign({}, this.state.issue);
-
-      issue[this.state.autocompleteKey] = this.state.autocomplete[0];
-      state.issue = issue;
-    }
-
     setTimeout(() => {
       this.setState(state);
     }, 250);
