@@ -20,6 +20,10 @@ input[type="text"], input[type="password"], button, select {
 
 input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {line-height: 1;}
 
+.fas {
+  font-size: 14pt;
+}
+
 .absolute {position: absolute;}
 .relative {position: relative;}
 
@@ -82,6 +86,7 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 .bgWhite {background-color: #fff;}
 
 .fs14 {font-size: 14pt;}
+.fs16 {font-size: 16pt;}
 
 .bold {font-weight: bold;}
 
@@ -100,8 +105,9 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 .csrPointer {cursor: pointer;}
 
-#addItemButton {
-  min-height: 65px;
+.clearSearchButton {
+  top: 5px;
+  right: 5px;
 }
 
 .suggestion:hover {
@@ -110,7 +116,14 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
   cursor: pointer;
 }
 
+.searchFieldAny {
+  padding: 5px 20px 5px 5px;
+}
+
 @media only screen and (max-width: 600px) {
+  .fas  {font-size: 24pt;}
+  .fs14 {font-size: 14pt;}
+  .fs16 {font-size: 16pt;}
 }
 
 @media only screen and (min-width: 601px) {

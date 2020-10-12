@@ -154,6 +154,23 @@ class App extends React.Component {
     return autocomplete ? autocomplete.slice(0, 5) : [];
   };
 
+  clearSearch = () => {
+    let search = this.state.search;
+
+    search.any = '';
+
+    if (this.state.cancelToken) {
+      this.state.cancelToken.cancel();
+    }
+
+    this.setState({
+      cancelToken: axios.CancelToken.source(),
+      search
+    }, () => {
+      this.getIssues();
+    });
+  };
+
   getIssues = () => {
     const data = {
       params: {
@@ -488,14 +505,14 @@ class App extends React.Component {
 
     return (
       <div className="mAuto w600">
-        <div className="flex spaceBetween alignCenter mb5 fs14">
+        <div className="flex spaceBetween alignCenter mb5">
           <div className="flex alignCenter mr10">
-            <i aria-hidden={true} className={`mr10 fs14 fas fa-book-open csrPointer`} onClick={() => {window.location.reload()}}></i>
+            <i aria-hidden={true} className={`mr5 fas fa-book-open csrPointer`} onClick={() => {window.location.reload()}}></i>
             <h1 className="fs14 bold csrPointer" onClick={() => {window.location.reload()}}>longbox</h1>
           </div>
           <div className="flex alignCenter">
             {this.state.user.isAdmin && (
-              <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} csrPointer`} onClick={this.toggleShowAddIssueForm}></i>
+              <i aria-hidden={true} className={`mr10 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} csrPointer`} onClick={this.toggleShowAddIssueForm}></i>
             )}
             {signInOutButton}
           </div>
@@ -509,14 +526,15 @@ class App extends React.Component {
           />
         }
         {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
-          <section id="search" className="mb5">
+          <section id="search" className="relative mb5">
             <input
-            className="bdrBox bdrBlack p5 wFull"
+            className="searchFieldAny mr10 bdrBox bdrBlack p5 wFull"
             name="any"
             onChange={this.handleSearchChange}
             placeholder="search by title, publisher, contributor, or notes"
             value={this.state.search.any}
             />
+            <i aria-hidden={true} className="clearSearchButton fas fa-times absolute csrPointer fs14" onClick={this.clearSearch}></i>
           </section>
         )}
         {this.state.showAddIssueForm && (

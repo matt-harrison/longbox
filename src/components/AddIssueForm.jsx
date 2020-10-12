@@ -39,12 +39,12 @@ class AddIssueForm extends React.Component {
       id="issue"
       onSubmit={this.props.addIssue}
       >
-        <div className="flex spaceBetween">
-          <h2 className="mb10 bold">
+        <div className="flex spaceBetween alignCenter mb10">
+          <h2 className="bold">
             {this.props.issue.title}
             {this.props.issue.number && ` #${this.props.issue.number}`}
           </h2>
-          <span onClick={this.props.handleClose} className="bold csrPointer">X</span>
+          <i aria-hidden={true} className="fas fa-times-circle csrPointer" onClick={this.props.handleClose}></i>
         </div>
         <div className="flex spaceBetween mb10">
           <div className="flex">
