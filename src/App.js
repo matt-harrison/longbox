@@ -19,6 +19,8 @@ class App extends React.Component {
       autocompleteIndex: null,
       autocompleteKey: null,
       cancelToken: axios.CancelToken.source(),
+      contributorIndex: null,
+      contributorKey: null,
       issue: null,
       issueDefault: {
         contributors: [
@@ -165,6 +167,7 @@ class App extends React.Component {
 
     this.setState({
       cancelToken: axios.CancelToken.source(),
+      issues: [],
       search
     }, () => {
       this.getIssues();
@@ -205,42 +208,26 @@ class App extends React.Component {
     });
   };
 
-  handleContributorTextBlur = () => {
-    const state = {
-      autocomplete: [],
-      autocompleteIndex: null,
-      autocompleteKey: null
-    };
-
-    if (this.state.autocomplete.length === 1) {
-      const issue = Object.assign({}, this.state.issue);
-
-      issue.contributors[this.state.autocompleteIndex][this.state.autocompleteKey] = this.state.autocomplete[0];
-      state.issue = issue;
-    }
-
-    setTimeout(() => {
-      this.setState(state);
-    }, 250);
-  }
-
-  handleContributorTextChange = (event, index, contributorId, key) => {
-    let   autocomplete = [];
-    const issue        = this.state.issue;
-    const value        = event.target.value;
+  handleContributorTextChange = event => {
+    let   autocomplete     = [];
+    const issue            = this.state.issue;
+    const contributorId    = event.target.dataset.contributorId;
+    const contributorIndex = parseInt(event.target.dataset.contributorIndex, 10);
+    const contributorKey   = event.target.dataset.contributorKey;
+    const value            = event.target.value;
 
     if (contributorId) {
       issue.contributors.forEach(contributor => {
         if (contributor.id === contributorId) {
-          contributor[key] = value;
+          contributor[contributorKey] = value;
         }
       });
     } else {
-      if (!issue.contributors[index]) {
-        issue.contributors[index] = {};
+      if (!issue.contributors[contributorIndex]) {
+        issue.contributors[contributorIndex] = {};
       }
 
-      issue.contributors[index][key] = value;
+      issue.contributors[contributorIndex][contributorKey] = value;
     }
 
     if (this.state.cancelToken) {
@@ -251,29 +238,22 @@ class App extends React.Component {
       cancelToken: axios.CancelToken.source(),
       issue
     }, async () => {
-      autocomplete = await this.autocomplete(key, value, index);
+      autocomplete = await this.autocomplete(contributorKey, value, contributorIndex);
 
       const isMatch = autocomplete.length === 1 && autocomplete[0] === value;
 
       this.setState({
         autocomplete: isMatch ? [] : autocomplete,
-        autocompleteIndex: isMatch ? null : index,
-        autocompleteKey: isMatch ? null : key,
-        cancelToken: null
+        autocompleteIndex: null,
+        autocompleteKey: isMatch ? null : contributorKey,
+        cancelToken: null,
+        contributorIndex: isMatch ? null : contributorIndex,
+        contributorKey: isMatch ? null : contributorKey
       });
     });
   };
 
-  handleIssueCheckboxChange = event => {
-    const key   = event.target.id;
-    const issue = Object.assign({}, this.state.issue);
-
-    issue[key] = !issue[key];
-
-    this.setState({issue});
-  };
-
-  handleIssueTextBlur = () => {
+  handleInputBlur = () => {
     const state = {
       autocomplete: [],
       autocompleteIndex: null,
@@ -284,6 +264,15 @@ class App extends React.Component {
       this.setState(state);
     }, 250);
   }
+
+  handleIssueCheckboxChange = event => {
+    const key   = event.target.id;
+    const issue = Object.assign({}, this.state.issue);
+
+    issue[key] = !issue[key];
+
+    this.setState({issue});
+  };
 
   handleIssueTextChange = async event => {
     let   autocomplete = [];
@@ -318,6 +307,66 @@ class App extends React.Component {
     });
   };
 
+  handleInputKeyDown = event => {
+    let autocompleteIndex = this.state.autocompleteIndex;
+    let autocompleteKey   = this.state.autocompleteKey;
+    let contributorIndex  = this.state.contributorIndex;
+    let contributorKey    = this.state.contributorKey;
+
+    const keyCode = event.which || event.keyCode || window.event.keyCode;
+
+    if (keyCode === 38) {
+      if (typeof this.state.autocompleteIndex === 'number') {
+        autocompleteIndex = autocompleteIndex === 0 ? this.state.autocomplete.length - 1 : autocompleteIndex - 1;
+      } else {
+        autocompleteIndex = this.state.autocomplete.length - 1;
+        this.state.autocompleteKey = contributorKey || event.target.id;
+      }
+
+      this.setState({
+        autocompleteIndex,
+        autocompleteKey
+      });
+    }
+
+    if (keyCode === 40) {
+      if (typeof autocompleteIndex === 'number') {
+        autocompleteIndex = autocompleteIndex === this.state.autocomplete.length - 1 ? 0 : autocompleteIndex + 1;
+      } else {
+        autocompleteIndex = 0;
+        autocompleteKey = contributorKey || event.target.id;
+      }
+
+      this.setState({
+        autocompleteIndex,
+        autocompleteKey
+      });
+    }
+
+    if ((keyCode === 9 || keyCode === 13) && typeof autocompleteIndex === 'number') {
+      const issue = this.state.issue;
+
+      if (typeof contributorIndex === 'number') {
+        issue.contributors[contributorIndex][contributorKey] = this.state.autocomplete[autocompleteIndex];
+      } else {
+        issue[autocompleteKey] = this.state.autocomplete[autocompleteIndex];
+      }
+
+      if (keyCode === 13) {
+        event.preventDefault();
+      }
+
+      this.setState({
+        autocomplete: [],
+        autocompleteIndex: null,
+        autocompleteKey: null,
+        contributorIndex: null,
+        contributorKey: null,
+        issue
+      });
+    }
+  };
+
   handleLoginChange = (event) => {
     let login = this.state.login;
 
@@ -346,8 +395,8 @@ class App extends React.Component {
   handleSuggestionClick = event => {
     const issue = this.state.issue;
 
-    if (this.state.autocompleteIndex !== null) {
-      issue.contributors[this.state.autocompleteIndex][this.state.autocompleteKey] = event.target.innerHTML;
+    if (this.state.contributorIndex !== null) {
+      issue.contributors[this.state.contributorIndex][this.state.autocompleteKey] = event.target.innerHTML;
     } else {
       issue[this.state.autocompleteKey] = event.target.innerHTML;
     }
@@ -541,11 +590,11 @@ class App extends React.Component {
           <AddIssueForm
           addContributor={this.addContributor}
           handleClose={this.handleAddIssueFormClose}
-          handleContributorTextBlur={this.handleContributorTextBlur}
+          handleInputBlur={this.handleInputBlur}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
-          handleIssueTextBlur={this.handleIssueTextBlur}
           handleIssueTextChange={this.handleIssueTextChange}
+          handleInputKeyDown={this.handleInputKeyDown}
           issue={this.state.issue}
           addIssue={this.addIssue}
           user={this.state.user}
@@ -555,11 +604,11 @@ class App extends React.Component {
           <EditIssueForm
           addContributor={this.addContributor}
           handleClose={this.setIssue}
-          handleContributorTextBlur={this.handleContributorTextBlur}
+          handleInputBlur={this.handleInputBlur}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
-          handleIssueTextBlur={this.handleIssueTextBlur}
           handleIssueTextChange={this.handleIssueTextChange}
+          handleInputKeyDown={this.handleInputKeyDown}
           issue={this.state.issue}
           updateIssue={this.updateIssue}
           user={this.state.user}
@@ -590,7 +639,7 @@ class App extends React.Component {
           {this.state.autocomplete.map((suggestion, index) => {
             return (
               <div
-              className="suggestion p5"
+              className={`suggestion p5 ${index === this.state.autocompleteIndex ? 'active' : ''}`}
               key={index}
               onClick={this.handleSuggestionClick}
               >

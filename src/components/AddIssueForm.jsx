@@ -9,24 +9,32 @@ class AddIssueForm extends React.Component {
             <label htmlFor={`creator_type${index}`}>type</label>
             <input
             className="bdrBox bdrBlack p5 wFull"
+            data-contributor-id={contributor.id}
+            data-contributor-index={index}
+            data-contributor-key="creator_type"
             id={`creator_type${index}`}
             name={`creator_type${index}`}
+            onBlur={this.props.handleInputBlur}
+            onChange={this.props.handleContributorTextChange}
+            onFocus={this.props.handleContributorTextChange}
+            onKeyDown={this.props.handleInputKeyDown}
             value={contributor.creator_type}
-            onBlur={this.props.handleContributorTextBlur}
-            onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
-            onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator_type')}}
             />
           </div>
           <div className="wFull">
             <label htmlFor={`creator${index}`}>name</label>
             <input
             className="bdrBox bdrBlack p5 wFull"
+            data-contributor-id={contributor.id}
+            data-contributor-index={index}
+            data-contributor-key="creator"
             id={`creator${index}`}
             name={`creator${index}`}
+            onBlur={this.props.handleInputBlur}
+            onChange={this.props.handleContributorTextChange}
+            onFocus={this.props.handleContributorTextChange}
+            onKeyDown={this.props.handleInputKeyDown}
             value={contributor.creator}
-            onBlur={this.props.handleContributorTextBlur}
-            onChange={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
-            onFocus={event => {this.props.handleContributorTextChange(event, index, contributor.id, 'creator')}}
             />
           </div>
         </div>
@@ -88,9 +96,10 @@ class AddIssueForm extends React.Component {
             className="bdrBox bdrBlack p5 wFull"
             id="title"
             name="title"
-            onBlur={this.props.handleIssueTextBlur}
+            onBlur={this.props.handleInputBlur}
             onChange={this.props.handleIssueTextChange}
             onFocus={this.props.handleIssueTextChange}
+            onKeyDown={this.props.handleInputKeyDown}
             value={this.props.issue.title}
             />
           </div>
@@ -100,7 +109,7 @@ class AddIssueForm extends React.Component {
             className="bdrBox bdrBlack p5 wFull"
             id="number"
             name="number"
-            onBlur={this.props.handleIssueTextBlur}
+            onBlur={this.props.handleInputBlur}
             onChange={this.props.handleIssueTextChange}
             onFocus={this.props.handleIssueTextChange}
             value={this.props.issue.number || ''}
@@ -113,7 +122,7 @@ class AddIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="sort_title"
           name="sort_title"
-          onBlur={this.props.handleIssueTextBlur}
+          onBlur={this.props.handleInputBlur}
           onChange={this.props.handleIssueTextChange}
           onFocus={this.props.handleIssueTextChange}
           value={this.props.issue.sort_title}
@@ -125,9 +134,10 @@ class AddIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="publisher"
           name="publisher"
-          onBlur={this.props.handleIssueTextBlur}
+          onBlur={this.props.handleInputBlur}
           onChange={this.props.handleIssueTextChange}
           onFocus={this.props.handleIssueTextChange}
+          onKeyDown={this.props.handleInputKeyDown}
           value={this.props.issue.publisher || ''}
           />
         </div>
@@ -147,9 +157,10 @@ class AddIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="format"
           name="format"
-          onBlur={this.props.handleIssueTextBlur}
+          onBlur={this.props.handleInputBlur}
           onChange={this.props.handleIssueTextChange}
           onFocus={this.props.handleIssueTextChange}
+          onKeyDown={this.props.handleInputKeyDown}
           value={this.props.issue.format}
           />
         </div>

@@ -107,17 +107,17 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 .clearSearchButton {
   top: 5px;
-  right: 5px;
+  right: 7px;
 }
 
-.suggestion:hover {
+.suggestion:hover, .suggestion.active {
   background-color: gray;
   color: white;
   cursor: pointer;
 }
 
 .searchFieldAny {
-  padding: 5px 20px 5px 5px;
+  padding: 5px 25px 5px 5px;
 }
 
 @media only screen and (max-width: 600px) {
