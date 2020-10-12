@@ -29,7 +29,7 @@ class App extends React.Component {
           },
           {
             creator: '',
-            creator_type: 'artist',
+            creator_type: 'penciller',
             id: null
           }
         ],
@@ -37,7 +37,7 @@ class App extends React.Component {
         is_color: true,
         is_owned: true,
         is_read: false,
-        notes: '',
+        notes: ``,
         number: null,
         publisher: '',
         sort_title: '',
@@ -188,6 +188,25 @@ class App extends React.Component {
     });
   };
 
+  handleContributorTextBlur = () => {
+    const state = {
+      autocomplete: [],
+      autocompleteIndex: null,
+      autocompleteKey: null
+    };
+
+    if (this.state.autocomplete.length === 1) {
+      const issue = Object.assign({}, this.state.issue);
+
+      issue.contributors[this.state.autocompleteIndex][this.state.autocompleteKey] = this.state.autocomplete[0];
+      state.issue = issue;
+    }
+
+    setTimeout(() => {
+      this.setState(state);
+    }, 250);
+  }
+
   handleContributorTextChange = (event, index, contributorId, key) => {
     let   autocomplete = [];
     const issue        = this.state.issue;
@@ -217,33 +236,16 @@ class App extends React.Component {
     }, async () => {
       autocomplete = await this.autocomplete(key, value, index);
 
+      const isMatch = autocomplete.length === 1 && autocomplete[0] === value;
+
       this.setState({
-        autocomplete,
-        autocompleteKey: key,
-        autocompleteIndex: index,
+        autocomplete: isMatch ? [] : autocomplete,
+        autocompleteIndex: isMatch ? null : index,
+        autocompleteKey: isMatch ? null : key,
         cancelToken: null
       });
     });
   };
-
-  handleContributorTextBlur = () => {
-    const state = {
-      autocomplete: [],
-      autocompleteIndex: null,
-      autocompleteKey: null
-    };
-
-    if (this.state.autocomplete.length === 1) {
-      const issue = Object.assign({}, this.state.issue);
-
-      issue.contributors[this.state.autocompleteIndex][this.state.autocompleteKey] = this.state.autocomplete[0];
-      state.issue = issue;
-    }
-
-    setTimeout(() => {
-      this.setState(state);
-    }, 250);
-  }
 
   handleIssueCheckboxChange = event => {
     const key   = event.target.id;
@@ -288,10 +290,12 @@ class App extends React.Component {
     }, async () => {
       autocomplete = await this.autocomplete(key, value);
 
+      const isMatch = autocomplete.length === 1 && autocomplete[0] === value;
+
       this.setState({
-        autocomplete,
+        autocomplete: isMatch ? [] : autocomplete,
         autocompleteIndex: null,
-        autocompleteKey: key,
+        autocompleteKey: isMatch ? null : key,
         cancelToken: null
       });
     });
