@@ -40,7 +40,7 @@ class App extends React.Component {
         is_owned: true,
         is_read: false,
         notes: ``,
-        number: null,
+        numbers: null,
         publisher: '',
         sort_title: '',
         title: '',
@@ -58,6 +58,7 @@ class App extends React.Component {
       showAddIssueForm: false,
       showEditIssueForm: false,
       showSignInForm: false,
+      showTitles: false,
       user: utils.getCookie()
     };
   };
@@ -81,11 +82,15 @@ class App extends React.Component {
   addIssue = event => {
     event.preventDefault();
 
+    const issue = this.state.issue;
+
+    issue.numbers = utils.expandNumbers(issue.numbers).join(',');
+
     const data   = {
       params: {
         username: this.state.user.name,
         md5:      this.state.user.md5,
-        issue:    this.state.issue
+        issue
       }
     };
 
@@ -93,6 +98,7 @@ class App extends React.Component {
       if (response) {
         this.setState({
           issue: null,
+          issues: [],
           showAddIssueForm: false,
           showEditIssueForm: false
         }, () => {
@@ -316,7 +322,7 @@ class App extends React.Component {
     const keyCode = event.which || event.keyCode || window.event.keyCode;
 
     if (keyCode === 38) {
-      if (typeof this.state.autocompleteIndex === 'number') {
+      if (typeof this.state.autocompleteIndex === 'numbers') {
         autocompleteIndex = autocompleteIndex === 0 ? this.state.autocomplete.length - 1 : autocompleteIndex - 1;
       } else {
         autocompleteIndex = this.state.autocomplete.length - 1;
@@ -330,7 +336,7 @@ class App extends React.Component {
     }
 
     if (keyCode === 40) {
-      if (typeof autocompleteIndex === 'number') {
+      if (typeof autocompleteIndex === 'numbers') {
         autocompleteIndex = autocompleteIndex === this.state.autocomplete.length - 1 ? 0 : autocompleteIndex + 1;
       } else {
         autocompleteIndex = 0;
@@ -343,10 +349,10 @@ class App extends React.Component {
       });
     }
 
-    if ((keyCode === 9 || keyCode === 13) && typeof autocompleteIndex === 'number') {
+    if ((keyCode === 9 || keyCode === 13) && typeof autocompleteIndex === 'numbers') {
       const issue = this.state.issue;
 
-      if (typeof contributorIndex === 'number') {
+      if (typeof contributorIndex === 'numbers') {
         issue.contributors[contributorIndex][contributorKey] = this.state.autocomplete[autocompleteIndex];
       } else {
         issue[autocompleteKey] = this.state.autocomplete[autocompleteIndex];
@@ -386,7 +392,9 @@ class App extends React.Component {
 
     this.setState({
       cancelToken: axios.CancelToken.source(),
-      search
+      issues: [],
+      search,
+      showTitles: true
     }, () => {
       this.getIssues();
     });
@@ -442,6 +450,18 @@ class App extends React.Component {
       showEditIssueForm: data !== null
     });
   };
+
+  setSearchAny = any => {
+    this.setState({
+      issues: [],
+      search: {
+        any
+      },
+      showTitles: false
+    }, () => {
+      this.getIssues();
+    });
+  }
 
   signIn = (event) => {
     event.preventDefault();
@@ -545,23 +565,25 @@ class App extends React.Component {
   };
 
   render() {
-    const digits = this.state.issues.length.toString().length;
+    const digits          = this.state.issues.length.toString().length;
+    const showIssues      = !this.state.showAddIssueForm && !this.state.showEditIssueForm;
+    const titles          = utils.condenseTitles(this.state.issues);
     const signInOutButton = (this.state.user.isSignedIn) ? (
-      <i aria-hidden={true} className="fas fa-sign-out-alt csrPointer" onClick={this.signOut}></i>
+      <i aria-hidden={true} className="fas fa-sign-out-alt pointer" onClick={this.signOut}></i>
     ) : (
-      <i aria-hidden={true} className="fas fa-sign-in-alt csrPointer" onClick={this.toggleShowSignInForm}></i>
+      <i aria-hidden={true} className="fas fa-sign-in-alt pointer" onClick={this.toggleShowSignInForm}></i>
     );
 
     return (
       <div className="mAuto w600">
         <div className="flex spaceBetween alignCenter mb5">
           <div className="flex alignCenter mr10">
-            <i aria-hidden={true} className={`mr5 fas fa-book-open csrPointer`} onClick={() => {window.location.reload()}}></i>
-            <h1 className="fs14 bold csrPointer" onClick={() => {window.location.reload()}}>longbox</h1>
+            <i aria-hidden={true} className={`mr5 fas fa-book-open pointer`} onClick={() => {window.location.reload()}}></i>
+            <h1 className="fs14 bold pointer" onClick={() => {window.location.reload()}}>longbox</h1>
           </div>
           <div className="flex alignCenter">
             {this.state.user.isAdmin && (
-              <i aria-hidden={true} className={`mr10 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} csrPointer`} onClick={this.toggleShowAddIssueForm}></i>
+              <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleShowAddIssueForm}></i>
             )}
             {signInOutButton}
           </div>
@@ -583,7 +605,7 @@ class App extends React.Component {
             placeholder="search by title, publisher, contributor, or notes"
             value={this.state.search.any}
             />
-            <i aria-hidden={true} className="clearSearchButton fas fa-times absolute csrPointer fs14" onClick={this.clearSearch}></i>
+            <i aria-hidden={true} className="clearSearchButton fas fa-times absolute pointer fs14" onClick={this.clearSearch}></i>
           </section>
         )}
         {this.state.showAddIssueForm && (
@@ -614,22 +636,39 @@ class App extends React.Component {
           user={this.state.user}
           />
         )}
-        {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
-          <section id="list" className="bdrBox mb5 bdrBlack p5">
-            {this.state.issues.length > 0 ? this.state.issues.map((issue, index) => {
-              const id = (index + 1).toString().padStart(digits, '\xa0');
-
-              return (
-                <div key={index}>
+        {this.state.showTitles && (
+          <section id="titles" className="list grid bdrBox mb5 bdrBlack p5">
+            {titles.length > 0 ? titles.map((title, index) => (
+              <React.Fragment key={index}>
+                <span className="mr5 txtR">{index + 1}.</span>
+                <div>
                   <span
-                  onClick={() => {this.setIssue(issue.id)}}
-                  className="csrPointer"
+                  className="pointer underline-on-hover"
+                  onClick={() => {this.setSearchAny(title.name)}}
                   >
-                    {id}. {issue.title}{issue.number ? ` #${issue.number}` : ''}
+                    {title.name}
+                  </span>
+                  <span>
+                    {title.numbers ? ` #${title.numbers}` : ''}
                   </span>
                 </div>
-              );
-            }) : (<div>...</div>)}
+              </React.Fragment>
+            )) : (<div>...</div>)}
+          </section>
+        )}
+        {showIssues && (
+          <section id="issues" className="list grid bdrBox mb5 bdrBlack p5">
+            {this.state.issues.length > 0 ? this.state.issues.map((issue, index) => (
+              <React.Fragment key={index}>
+                <span className="mr5 txtR">{index + 1}.</span>
+                <span
+                onClick={() => {this.setIssue(issue.id)}}
+                className="pointer underline-on-hover"
+                >
+                  {issue.title}{issue.number ? ` #${issue.number}` : ''}
+                </span>
+              </React.Fragment>
+            )) : (<div>...</div>)}
           </section>
         )}
         <div

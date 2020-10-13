@@ -31,6 +31,8 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 .overflow-hidden {overflow: hidden;}
 
+.grid {display: grid;}
+
 .flex {display: flex;}
 
 .flex-wrap {flex-wrap: wrap;}
@@ -96,6 +98,7 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 .txtBlack, .txtBlack:hover {color: black;}
 
 .txtC {text-align: center;}
+.txtR {text-align: right;}
 
 .truncate {
   overflow: hidden;
@@ -103,21 +106,29 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
   white-space: nowrap;
 }
 
-.csrPointer {cursor: pointer;}
+.pointer {cursor: pointer;}
+
+.underline-on-hover:hover {
+  text-decoration: underline;
+}
 
 .clearSearchButton {
   top: 5px;
   right: 7px;
 }
 
-.suggestion:hover, .suggestion.active {
-  background-color: gray;
-  color: white;
-  cursor: pointer;
+.list {
+  grid-template-columns: min-content auto;
 }
 
 .searchFieldAny {
   padding: 5px 25px 5px 5px;
+}
+
+.suggestion:hover, .suggestion.active {
+  background-color: gray;
+  color: white;
+  cursor: pointer;
 }
 
 @media only screen and (max-width: 600px) {

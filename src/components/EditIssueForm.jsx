@@ -56,9 +56,9 @@ class EditIssueForm extends React.Component {
         <div className="flex spaceBetween alignCenter mb10">
           <h2 className="bold">
             {this.props.issue.title}
-            {this.props.issue.number && ` #${this.props.issue.number}`}
+            {this.props.issue.numbers && ` #${this.props.issue.numbers}`}
           </h2>
-          <i aria-hidden={true} className="fas fa-times-circle csrPointer" onClick={this.props.handleClose}></i>
+          <i aria-hidden={true} className="fas fa-times-circle pointer" onClick={this.props.handleClose}></i>
         </div>
         <div className="flex spaceBetween mb10">
           <div className="flex">
@@ -113,14 +113,14 @@ class EditIssueForm extends React.Component {
             />
           </div>
           <div className="mb10 w100">
-            <label htmlFor="number">number</label>
+            <label htmlFor="numbers">number(s)</label>
             <input
             className="bdrBox bdrBlack p5 wFull"
-            id="number"
-            name="number"
+            id="numbers"
+            name="numbers"
             onBlur={this.props.handleInputBlur}
             onChange={this.props.handleIssueTextChange}
-            value={this.props.issue.number || ''}
+            value={this.props.issue.numbers || ''}
             />
           </div>
         </div>
@@ -189,12 +189,12 @@ class EditIssueForm extends React.Component {
         <div>
           <label>contributors</label>
           {contributors}
-          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus csrPointer`} onClick={this.props.addContributor}></i>
+          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus pointer`} onClick={this.props.addContributor}></i>
         </div>
         {this.props.user.isAdmin && (
           <div className="flex flexEnd mt10">
             <button
-            className="bdrBlack p5 csrPointer"
+            className="bdrBlack p5 pointer"
             type="submit"
             >
               update issue
