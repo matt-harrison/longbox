@@ -21,6 +21,7 @@ class App extends React.Component {
       cancelToken: axios.CancelToken.source(),
       contributorIndex: null,
       contributorKey: null,
+      isGroupedByTitle: false,
       issue: null,
       issueDefault: {
         contributors: [
@@ -58,7 +59,6 @@ class App extends React.Component {
       showAddIssueForm: false,
       showEditIssueForm: false,
       showSignInForm: false,
-      showTitles: false,
       user: utils.getCookie()
     };
   };
@@ -269,7 +269,7 @@ class App extends React.Component {
     setTimeout(() => {
       this.setState(state);
     }, 250);
-  }
+  };
 
   handleIssueCheckboxChange = event => {
     const key   = event.target.id;
@@ -322,11 +322,11 @@ class App extends React.Component {
     const keyCode = event.which || event.keyCode || window.event.keyCode;
 
     if (keyCode === 38) {
-      if (typeof this.state.autocompleteIndex === 'numbers') {
+      if (typeof this.state.autocompleteIndex === 'number') {
         autocompleteIndex = autocompleteIndex === 0 ? this.state.autocomplete.length - 1 : autocompleteIndex - 1;
       } else {
         autocompleteIndex = this.state.autocomplete.length - 1;
-        this.state.autocompleteKey = contributorKey || event.target.id;
+        autocompleteKey   = contributorKey || event.target.id;
       }
 
       this.setState({
@@ -336,7 +336,7 @@ class App extends React.Component {
     }
 
     if (keyCode === 40) {
-      if (typeof autocompleteIndex === 'numbers') {
+      if (typeof autocompleteIndex === 'number') {
         autocompleteIndex = autocompleteIndex === this.state.autocomplete.length - 1 ? 0 : autocompleteIndex + 1;
       } else {
         autocompleteIndex = 0;
@@ -349,10 +349,10 @@ class App extends React.Component {
       });
     }
 
-    if ((keyCode === 9 || keyCode === 13) && typeof autocompleteIndex === 'numbers') {
+    if ((keyCode === 9 || keyCode === 13) && typeof autocompleteIndex === 'number') {
       const issue = this.state.issue;
 
-      if (typeof contributorIndex === 'numbers') {
+      if (typeof contributorIndex === 'number') {
         issue.contributors[contributorIndex][contributorKey] = this.state.autocomplete[autocompleteIndex];
       } else {
         issue[autocompleteKey] = this.state.autocomplete[autocompleteIndex];
@@ -379,7 +379,7 @@ class App extends React.Component {
     login[event.target.name] = event.target.value;
 
     this.setState({login});
-  }
+  };
 
   handleSearchChange = event => {
     let search = this.state.search;
@@ -393,8 +393,7 @@ class App extends React.Component {
     this.setState({
       cancelToken: axios.CancelToken.source(),
       issues: [],
-      search,
-      showTitles: true
+      search
     }, () => {
       this.getIssues();
     });
@@ -457,11 +456,11 @@ class App extends React.Component {
       search: {
         any
       },
-      showTitles: false
+      isGroupedByTitle: false
     }, () => {
       this.getIssues();
     });
-  }
+  };
 
   signIn = (event) => {
     event.preventDefault();
@@ -498,7 +497,7 @@ class App extends React.Component {
         }
       }).catch();
     }
-  }
+  };
 
   signOut = () => {
     const user = {
@@ -515,7 +514,15 @@ class App extends React.Component {
       });
       utils.setCookie('user', '');
     });
-  }
+  };
+
+  toggleIsGroupedByTitle = () => {
+    const isGroupedByTitle = !this.state.isGroupedByTitle;
+
+    this.setState({
+      isGroupedByTitle
+    });
+  };
 
   toggleShowSignInForm = () => {
     const showSignInForm = !this.state.showSignInForm;
@@ -523,7 +530,7 @@ class App extends React.Component {
     this.setState({
       showSignInForm
     });
-  }
+  };
 
   toggleShowAddIssueForm = () => {
     const showAddIssueForm = !this.state.showAddIssueForm;
@@ -533,7 +540,7 @@ class App extends React.Component {
       showAddIssueForm,
       showEditIssueForm: false
     });
-  }
+  };
 
   updateIssue = event => {
     event.preventDefault();
@@ -565,8 +572,7 @@ class App extends React.Component {
   };
 
   render() {
-    const digits          = this.state.issues.length.toString().length;
-    const showIssues      = !this.state.showAddIssueForm && !this.state.showEditIssueForm;
+    const showIssues      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && !this.state.isGroupedByTitle;
     const titles          = utils.condenseTitles(this.state.issues);
     const signInOutButton = (this.state.user.isSignedIn) ? (
       <i aria-hidden={true} className="fas fa-sign-out-alt pointer" onClick={this.signOut}></i>
@@ -585,6 +591,7 @@ class App extends React.Component {
             {this.state.user.isAdmin && (
               <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleShowAddIssueForm}></i>
             )}
+            <i aria-hidden={true} className={`mr5 fas fa-folder ${this.state.isGroupedByTitle ? '' : 'txtRed'} pointer`} onClick={this.toggleIsGroupedByTitle}></i>
             {signInOutButton}
           </div>
         </div>
@@ -636,7 +643,7 @@ class App extends React.Component {
           user={this.state.user}
           />
         )}
-        {this.state.showTitles && (
+        {this.state.isGroupedByTitle && (
           <section id="titles" className="list grid bdrBox mb5 bdrBlack p5">
             {titles.length > 0 ? titles.map((title, index) => (
               <React.Fragment key={index}>
