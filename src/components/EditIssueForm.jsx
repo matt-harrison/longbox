@@ -56,7 +56,7 @@ class EditIssueForm extends React.Component {
         <div className="flex spaceBetween alignCenter mb10">
           <h2 className="bold">
             {this.props.issue.title}
-            {this.props.issue.numbers && ` #${this.props.issue.numbers}`}
+            {this.props.issue.number && ` #${this.props.issue.number}`}
           </h2>
           <i aria-hidden={true} className="fas fa-times-circle pointer" onClick={this.props.handleClose}></i>
         </div>
@@ -120,7 +120,7 @@ class EditIssueForm extends React.Component {
             name="numbers"
             onBlur={this.props.handleInputBlur}
             onChange={this.props.handleIssueTextChange}
-            value={this.props.issue.numbers || ''}
+            value={this.props.issue.number || ''}
             />
           </div>
         </div>
