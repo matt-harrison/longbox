@@ -84,7 +84,7 @@ class Main extends React.Component {
 
     const issue = this.state.issue;
 
-    issue.numbers = utils.expandNumbers(issue.numbers).join(',');
+    issue.numbers = issue.numbers ? utils.expandNumbers(issue.numbers).join(',') : [];
 
     const data   = {
       params: {
