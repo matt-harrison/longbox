@@ -54,7 +54,8 @@ class Main extends React.Component {
         username:  ''
       },
       search: {
-        any: params.has('any') ? params.get('any') : ''
+        any: params.has('any') ? params.get('any') : '',
+        issue_id: params.has('id') ? params.get('id') : ''
       },
       showAddIssueForm: false,
       showEditIssueForm: false,
@@ -176,6 +177,7 @@ class Main extends React.Component {
       issues: [],
       search
     }, () => {
+      this.setUrl();
       this.getIssues();
     });
   };
@@ -188,10 +190,6 @@ class Main extends React.Component {
       }
     };
 
-    if (this.state.cancelToken) {
-      data.cancelToken = this.state.cancelToken.token;
-    }
-
     axios.get('https://www.rootbeercomics.com/api/longbox/issues.php', data).then(response => {
       if (response) {
         response.data.issues.results.forEach(issue => {
@@ -200,9 +198,19 @@ class Main extends React.Component {
           issue.is_read  = utils.getNullableBoolean(issue.is_read);
         });
 
+        this.setUrl();
+
+        if (this.state.cancelToken) {
+          data.cancelToken = this.state.cancelToken.token;
+        }
+
         this.setState({
           cancelToken: null,
           issues: response.data.issues.results
+        }, () => {
+          if (this.state.search.issue_id) {
+            this.setIssue(this.state.search.issue_id);
+          }
         });
       }
     }).catch(error => {});
@@ -420,9 +428,15 @@ class Main extends React.Component {
     });
   };
 
+  resetUrl = () => {
+    this.props.history.push('/');
+    window.location.reload();
+  };
+
   setIssue = issueId => {
     let data         = null;
     let contributors = [];
+    let search = this.state.search;
 
     if (issueId) {
       this.state.issues.forEach(issue => {
@@ -442,11 +456,16 @@ class Main extends React.Component {
           window.scrollTo(0, 0);
         }
       });
+    } else {
+      search.issue_id = '';
     }
 
     this.setState({
       issue: data,
+      search,
       showEditIssueForm: data !== null
+    }, () => {
+      this.setUrl();
     });
   };
 
@@ -460,6 +479,24 @@ class Main extends React.Component {
     }, () => {
       this.getIssues();
     });
+  };
+
+  setUrl =() => {
+    const params = [];
+
+    if (this.state.search.any) {
+      params.push(`any=${this.state.search.any}`);
+    }
+
+    if (this.state.isGroupedByTitle) {
+      params.push('group=true');
+    }
+
+    if (this.state.issue?.id) {
+      params.push(`id=${this.state.issue?.id}`);
+    }
+
+    this.props.history.push(`${this.props.history.location.pathname}?${params.join('&')}`);
   };
 
   signIn = (event) => {
@@ -521,6 +558,8 @@ class Main extends React.Component {
 
     this.setState({
       isGroupedByTitle
+    }, () => {
+      this.setUrl();
     });
   };
 
@@ -573,6 +612,7 @@ class Main extends React.Component {
 
   render() {
     const showIssues      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && !this.state.isGroupedByTitle;
+    const showTitles      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && this.state.isGroupedByTitle;
     const titles          = utils.condenseTitles(this.state.issues);
     const signInOutButton = (this.state.user.isSignedIn) ? (
       <i aria-hidden={true} className="fas fa-sign-out-alt pointer" onClick={this.signOut}></i>
@@ -584,8 +624,8 @@ class Main extends React.Component {
       <div className="mAuto w600">
         <div className="flex spaceBetween alignCenter mb5">
           <div className="flex alignCenter mr10">
-            <i aria-hidden={true} className={`mr5 fas fa-book-open pointer`} onClick={() => {window.location.reload()}}></i>
-            <h1 className="fs14 bold pointer" onClick={() => {window.location.reload()}}>longbox</h1>
+            <i aria-hidden={true} className={`mr5 fas fa-book-open pointer`} onClick={this.resetUrl}></i>
+            <h1 className="fs14 bold pointer" onClick={this.resetUrl}>longbox</h1>
           </div>
           <div className="flex alignCenter">
             {this.state.user.isAdmin && (
@@ -643,7 +683,7 @@ class Main extends React.Component {
           user={this.state.user}
           />
         )}
-        {this.state.isGroupedByTitle && (
+        {showTitles && (
           <section id="titles" className="list grid bdrBox mb5 bdrBlack p5">
             {titles.length > 0 ? titles.map((title, index) => (
               <React.Fragment key={index}>
