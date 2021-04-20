@@ -13,6 +13,7 @@ class Main extends React.Component {
     super(props);
 
     const params = new URLSearchParams(this.props.location.search);
+    const user = utils.getCookie();
 
     this.state = {
       autocomplete: [],
@@ -59,8 +60,9 @@ class Main extends React.Component {
       },
       showAddIssueForm: false,
       showEditIssueForm: false,
+      showQuickToggle: params.has('toggle') && user.isAdmin ? params.get('toggle') === 'true' : false,
       showSignInForm: false,
-      user: utils.getCookie()
+      user
     };
   };
 
@@ -484,16 +486,20 @@ class Main extends React.Component {
   setUrl =() => {
     const params = [];
 
-    if (this.state.search.any) {
-      params.push(`any=${this.state.search.any}`);
-    }
-
     if (this.state.isGroupedByTitle) {
       params.push('group=true');
     }
 
     if (this.state.issue?.id) {
       params.push(`id=${this.state.issue?.id}`);
+    }
+
+    if (this.state.search.any) {
+      params.push(`any=${this.state.search.any}`);
+    }
+
+    if (this.state.showQuickToggle) {
+      params.push(`toggle=true`);
     }
 
     this.props.history.push(`${this.props.history.location.pathname}?${params.join('&')}`);
@@ -563,14 +569,6 @@ class Main extends React.Component {
     });
   };
 
-  toggleShowSignInForm = () => {
-    const showSignInForm = !this.state.showSignInForm;
-
-    this.setState({
-      showSignInForm
-    });
-  };
-
   toggleShowAddIssueForm = () => {
     const showAddIssueForm = !this.state.showAddIssueForm;
 
@@ -578,6 +576,24 @@ class Main extends React.Component {
       issue: JSON.parse(JSON.stringify(this.state.issueDefault)),
       showAddIssueForm,
       showEditIssueForm: false
+    });
+  };
+
+  toggleShowQuickToggle = () => {
+    const showQuickToggle = !this.state.showQuickToggle;
+
+    this.setState({
+      showQuickToggle
+    }, () => {
+      this.setUrl();
+    });
+  };
+
+  toggleShowSignInForm = () => {
+    const showSignInForm = !this.state.showSignInForm;
+
+    this.setState({
+      showSignInForm
     });
   };
 
@@ -610,9 +626,38 @@ class Main extends React.Component {
     });
   };
 
+  updateIssueByToggle = params => {
+    const issues = this.state.issues.slice();
+
+    params.issue[params.field] = !params.issue[params.field];
+
+    issues.forEach(issue => {
+      if (issue.id === params.issue.id) {
+        issue = params.issue;
+      }
+    });
+
+    const data   = {
+      params: {
+        username: this.state.user.name,
+        md5:      this.state.user.md5,
+        issue:    params.issue
+      }
+    };
+
+    axios.get('https://www.rootbeercomics.com/api/longbox/update.php', data).then(response => {
+      if (response) {
+        this.setState({
+          issues
+        });
+      }
+    });
+  };
+
   render() {
-    const showIssues      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && !this.state.isGroupedByTitle;
-    const showTitles      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && this.state.isGroupedByTitle;
+    const showIssues      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && !this.state.isGroupedByTitle && !this.state.showQuickToggle;
+    const showTitles      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && this.state.isGroupedByTitle && !this.state.showQuickToggle;
+    const showQuickToggle = !this.state.showAddIssueForm && !this.state.showEditIssueForm && this.state.showQuickToggle && this.state.user.isAdmin;
     const titles          = utils.condenseTitles(this.state.issues);
     const signInOutButton = (this.state.user.isSignedIn) ? (
       <i aria-hidden={true} className="fas fa-sign-out-alt pointer" onClick={this.signOut}></i>
@@ -629,7 +674,10 @@ class Main extends React.Component {
           </div>
           <div className="flex alignCenter">
             {this.state.user.isAdmin && (
-              <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleShowAddIssueForm}></i>
+              <>
+                <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleShowAddIssueForm}></i>
+                <i aria-hidden={true} className={`mr5 fas fa-check-square ${this.state.showQuickToggle ? '' : 'txtRed'} pointer`} onClick={this.toggleShowQuickToggle}></i>
+              </>
             )}
             <i aria-hidden={true} className={`mr5 fas fa-folder ${this.state.isGroupedByTitle ? '' : 'txtRed'} pointer`} onClick={this.toggleIsGroupedByTitle}></i>
             {signInOutButton}
@@ -717,6 +765,85 @@ class Main extends React.Component {
               </React.Fragment>
             )) : (<div>...</div>)}
           </section>
+        )}
+        {showQuickToggle && (
+          <table id="quick-toggle" className="bdrBox mb5 bdrBlack p5 flex100">
+            <tbody>
+              {this.state.issues.length > 0 ? this.state.issues.map((issue, index) => (
+                <tr key={index}>
+                  <td>
+                    <span className="mr5 txtR">{index + 1}.</span>
+                    <span
+                    onClick={() => {this.setIssue(issue.id)}}
+                    className="pointer underline-on-hover"
+                    >
+                      {issue.title}{issue.number ? ` #${issue.number}` : ''}
+                    </span>
+                  </td>
+                  <td className="mr10 whitespace-no-wrap">
+                    <input
+                    checked={issue.is_read}
+                    className="inline-block mr5 pointer"
+                    id={`read${index}`}
+                    onChange={() => {
+                      this.updateIssueByToggle({
+                        field: 'is_read',
+                        issue
+                      });
+                    }}
+                    type="checkbox"
+                    />
+                    <label
+                    className="inline-block pointer"
+                    htmlFor={`read${index}`}
+                    >
+                      read
+                    </label>
+                  </td>
+                  <td className="mr10 whitespace-no-wrap">
+                    <input
+                    checked={issue.is_owned}
+                    className="inline-block mr5 pointer"
+                    id={`owned${index}`}
+                    onChange={() => {
+                      this.updateIssueByToggle({
+                        field: 'is_owned',
+                        issue
+                      });
+                    }}
+                    type="checkbox"
+                    />
+                    <label
+                    className="inline-block pointer"
+                    htmlFor={`owned${index}`}
+                    >
+                      owned
+                    </label>
+                  </td>
+                  <td className="whitespace-no-wrap">
+                    <input
+                    checked={issue.is_color}
+                    className="inline-block mr5 pointer"
+                    id={`color${index}`}
+                    onChange={() => {
+                      this.updateIssueByToggle({
+                        field: 'is_color',
+                        issue
+                      });
+                    }}
+                    type="checkbox"
+                    />
+                    <label
+                    className="inline-block pointer"
+                    htmlFor={`color${index}`}
+                    >
+                      color
+                    </label>
+                  </td>
+                </tr>
+              )) : (<tr><td colSpan="4">...</td></tr>)}
+            </tbody>
+          </table>
         )}
         <div
         className={`absolute bdrBlack bgWhite overflow-hidden ${this.state.autocomplete.length > 0 ? '' : 'hidden'}`}

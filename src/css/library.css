@@ -31,9 +31,9 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 
 .overflow-hidden {overflow: hidden;}
 
-.grid {display: grid;}
-
-.flex {display: flex;}
+.flex         {display: flex;}
+.grid         {display: grid;}
+.inline-block {display: inline-block;}
 
 .flex-wrap {flex-wrap: wrap;}
 
@@ -103,6 +103,10 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
 .truncate {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whitespace-no-wrap {
   white-space: nowrap;
 }
 
