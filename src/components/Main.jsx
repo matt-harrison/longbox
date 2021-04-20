@@ -190,6 +190,10 @@ class Main extends React.Component {
       }
     };
 
+    if (this.state.cancelToken) {
+      data.cancelToken = this.state.cancelToken.token;
+    }
+
     axios.get('https://www.rootbeercomics.com/api/longbox/issues.php', data).then(response => {
       if (response) {
         response.data.issues.results.forEach(issue => {
@@ -199,10 +203,6 @@ class Main extends React.Component {
         });
 
         this.setUrl();
-
-        if (this.state.cancelToken) {
-          data.cancelToken = this.state.cancelToken.token;
-        }
 
         this.setState({
           cancelToken: null,
