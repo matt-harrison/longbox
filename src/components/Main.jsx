@@ -60,7 +60,7 @@ class Main extends React.Component {
       },
       showAddIssueForm: false,
       showEditIssueForm: false,
-      showQuickToggle: params.has('toggle') && user.isAdmin ? params.get('toggle') === 'true' : false,
+      showQuickToggle: params.has('toggle') ? params.get('toggle') === 'true' : false,
       showSignInForm: false,
       user
     };
@@ -181,6 +181,8 @@ class Main extends React.Component {
     }, () => {
       this.setUrl();
       this.getIssues();
+
+      document.querySelector('.searchFieldAny').focus();
     });
   };
 
@@ -657,7 +659,7 @@ class Main extends React.Component {
   render() {
     const showIssues      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && !this.state.isGroupedByTitle && !this.state.showQuickToggle;
     const showTitles      = !this.state.showAddIssueForm && !this.state.showEditIssueForm && this.state.isGroupedByTitle && !this.state.showQuickToggle;
-    const showQuickToggle = !this.state.showAddIssueForm && !this.state.showEditIssueForm && this.state.showQuickToggle && this.state.user.isAdmin;
+    const showQuickToggle = !this.state.showAddIssueForm && !this.state.showEditIssueForm && this.state.showQuickToggle;
     const titles          = utils.condenseTitles(this.state.issues);
     const signInOutButton = (this.state.user.isSignedIn) ? (
       <i aria-hidden={true} className="fas fa-sign-out-alt pointer" onClick={this.signOut}></i>
@@ -674,11 +676,9 @@ class Main extends React.Component {
           </div>
           <div className="flex alignCenter">
             {this.state.user.isAdmin && (
-              <>
-                <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleShowAddIssueForm}></i>
-                <i aria-hidden={true} className={`mr5 fas fa-check-square ${this.state.showQuickToggle ? '' : 'txtRed'} pointer`} onClick={this.toggleShowQuickToggle}></i>
-              </>
+              <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleShowAddIssueForm}></i>
             )}
+            <i aria-hidden={true} className={`mr5 fas fa-check-square ${this.state.showQuickToggle ? '' : 'txtRed'} pointer`} onClick={this.toggleShowQuickToggle}></i>
             <i aria-hidden={true} className={`mr5 fas fa-folder ${this.state.isGroupedByTitle ? '' : 'txtRed'} pointer`} onClick={this.toggleIsGroupedByTitle}></i>
             {signInOutButton}
           </div>
@@ -786,10 +786,12 @@ class Main extends React.Component {
                     className="inline-block mr5 pointer"
                     id={`read${index}`}
                     onChange={() => {
-                      this.updateIssueByToggle({
-                        field: 'is_read',
-                        issue
-                      });
+                      if (this.state.user.isAdmin) {
+                        this.updateIssueByToggle({
+                          field: 'is_read',
+                          issue
+                        });
+                      }
                     }}
                     type="checkbox"
                     />
@@ -806,10 +808,12 @@ class Main extends React.Component {
                     className="inline-block mr5 pointer"
                     id={`owned${index}`}
                     onChange={() => {
-                      this.updateIssueByToggle({
-                        field: 'is_owned',
-                        issue
-                      });
+                      if (this.state.user.isAdmin) {
+                        this.updateIssueByToggle({
+                          field: 'is_owned',
+                          issue
+                        });
+                      }
                     }}
                     type="checkbox"
                     />
@@ -826,10 +830,12 @@ class Main extends React.Component {
                     className="inline-block mr5 pointer"
                     id={`color${index}`}
                     onChange={() => {
-                      this.updateIssueByToggle({
-                        field: 'is_color',
-                        issue
-                      });
+                      if (this.state.user.isAdmin) {
+                        this.updateIssueByToggle({
+                          field: 'is_color',
+                          issue
+                        });
+                      }
                     }}
                     type="checkbox"
                     />

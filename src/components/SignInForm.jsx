@@ -12,7 +12,7 @@ class SignInForm extends React.PureComponent {
             <input type="password" name="password" placeholder="password" value={this.props.password} onChange={this.props.handleLoginChange} className="bdrBox bdrGray p5 flex100"/>
           </div>
         </div>
-        <button type="submit" className="bdrBox bdrGray p5 flex20 csrPointer">sign in</button>
+        <button type="submit" className="bdrBox bdrGray p5 flex20 pointer">sign in</button>
       </form>
     );
   }
