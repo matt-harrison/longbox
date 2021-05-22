@@ -796,7 +796,7 @@ class Main extends React.Component {
                     type="checkbox"
                     />
                     <label
-                    className="inline-block pointer"
+                    className={`inline-block pointer ${issue.is_read === null ? 'txtRed' : ''}`}
                     htmlFor={`read${index}`}
                     >
                       read
@@ -818,7 +818,7 @@ class Main extends React.Component {
                     type="checkbox"
                     />
                     <label
-                    className="inline-block pointer"
+                    className={`inline-block pointer ${issue.is_owned === null ? 'txtRed' : ''}`}
                     htmlFor={`owned${index}`}
                     >
                       owned
@@ -840,7 +840,7 @@ class Main extends React.Component {
                     type="checkbox"
                     />
                     <label
-                    className="inline-block pointer"
+                    className={`inline-block pointer ${issue.is_color === null ? 'txtRed' : ''}`}
                     htmlFor={`color${index}`}
                     >
                       color
