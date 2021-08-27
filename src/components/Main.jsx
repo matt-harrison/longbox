@@ -22,6 +22,7 @@ class Main extends React.Component {
       cancelToken: axios.CancelToken.source(),
       contributorIndex: null,
       contributorKey: null,
+      errors: [],
       isGroupedByTitle: params.has('group') ? params.get('group') === 'true' : false,
       issue: null,
       issueDefault: {
@@ -169,6 +170,7 @@ class Main extends React.Component {
     let search = this.state.search;
 
     search.any = '';
+    search.issue_id = '';
 
     if (this.state.cancelToken) {
       this.state.cancelToken.cancel();
@@ -223,6 +225,19 @@ class Main extends React.Component {
   handleAddIssueFormClose = () => {
     this.setState({
       showAddIssueForm: false
+    });
+  };
+
+  handleEditIssueFormClose = () => {
+    let search = this.state.search;
+
+    search.issue_id = '';
+
+    this.setState({
+      errors: [],
+      search
+    }, () => {
+      this.setIssue();
     });
   };
 
@@ -573,11 +588,18 @@ class Main extends React.Component {
 
   toggleShowAddIssueForm = () => {
     const showAddIssueForm = !this.state.showAddIssueForm;
+    let search = this.state.search;
+
+    search.issue_id = '';
 
     this.setState({
+      errors: [],
       issue: JSON.parse(JSON.stringify(this.state.issueDefault)),
+      search,
       showAddIssueForm,
       showEditIssueForm: false
+    }, () => {
+      this.setUrl()
     });
   };
 
@@ -617,14 +639,23 @@ class Main extends React.Component {
       }
     });
 
-    axios.get('https://www.rootbeercomics.com/api/longbox/update.php', data).then(response => {
-      if (response) {
-        this.setState({
-          issue: null,
-          issues,
-          showEditIssueForm: false
-        }, this.setUrl);
-      }
+    this.setState({
+      errors: []
+    }, () => {
+      axios.get('https://www.rootbeercomics.com/api/longbox/update.php', data).then(response => {
+        if (response.data.success) {
+          this.setState({
+            errors: [],
+            issue: null,
+            issues,
+            showEditIssueForm: false
+          }, this.setUrl);
+        } else {
+          this.setState({
+            errors: response.data.errors
+          });
+        }
+      });
     });
   };
 
@@ -706,6 +737,7 @@ class Main extends React.Component {
         {this.state.showAddIssueForm && (
           <AddIssueForm
           addContributor={this.addContributor}
+          errors={this.state.errors}
           handleClose={this.handleAddIssueFormClose}
           handleInputBlur={this.handleInputBlur}
           handleContributorTextChange={this.handleContributorTextChange}
@@ -720,7 +752,8 @@ class Main extends React.Component {
         {this.state.showEditIssueForm && (
           <EditIssueForm
           addContributor={this.addContributor}
-          handleClose={this.setIssue}
+          errors={this.state.errors}
+          handleClose={this.handleEditIssueFormClose}
           handleInputBlur={this.handleInputBlur}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}

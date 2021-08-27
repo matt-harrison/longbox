@@ -54,6 +54,13 @@ class AddIssueForm extends React.Component {
           </h2>
           <i aria-hidden={true} className="fas fa-times-circle pointer" onClick={this.props.handleClose}></i>
         </div>
+        {this.props.errors.length > 0 && (
+          <ul className="errors mb10 txtRed">
+            {this.props.errors.map(error => (
+              <li>{error}</li>
+            ))}
+          </ul>
+        )}
         <div className="flex spaceBetween mb10">
           <div className="flex">
             <input
