@@ -605,9 +605,9 @@ class Main extends React.Component {
     const issues = this.state.issues.slice();
     const data   = {
       params: {
-        username: this.state.user.name,
+        issue:    this.state.issue,
         md5:      this.state.user.md5,
-        issue:    this.state.issue
+        username: this.state.user.name
       }
     };
 
@@ -623,7 +623,7 @@ class Main extends React.Component {
           issue: null,
           issues,
           showEditIssueForm: false
-        });
+        }, this.setUrl);
       }
     });
   };
