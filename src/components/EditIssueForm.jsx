@@ -2,51 +2,6 @@ import React from 'react';
 
 class EditIssueForm extends React.Component {
   render() {
-    const contributors = this.props.issue.contributors ? this.props.issue.contributors.map((contributor, index) => {
-      return (
-        <div key={contributor.id} className="flex mb10 ml10">
-          <div className="mr10 w100">
-            <div className="flex">
-              <label className="mr5" htmlFor={`creator_type${index}`}>type</label>
-              <span>[{contributor.creator_type_id}]</span>
-            </div>
-            <input
-            className="bdrBox bdrBlack p5 wFull"
-            data-contributor-id={contributor.id}
-            data-contributor-index={index}
-            data-contributor-key="creator_type"
-            id={`creator_type${index}`}
-            name={`creator_type${index}`}
-            onBlur={this.props.handleInputBlur}
-            onChange={this.props.handleContributorTextChange}
-            onFocus={this.props.handleContributorTextChange}
-            onKeyDown={this.props.handleInputKeyDown}
-            value={contributor.creator_type}
-            />
-          </div>
-          <div className="wFull">
-            <div className="flex">
-              <label className="mr5" htmlFor={`creator${index}`}>name</label>
-              <span>[{contributor.creator_id}]</span>
-            </div>
-            <input
-            className="bdrBox bdrBlack p5 wFull"
-            data-contributor-id={contributor.id}
-            data-contributor-index={index}
-            data-contributor-key="creator"
-            id={`creator${index}`}
-            name={`creator${index}`}
-            onBlur={this.props.handleInputBlur}
-            onChange={this.props.handleContributorTextChange}
-            onFocus={this.props.handleContributorTextChange}
-            onKeyDown={this.props.handleInputKeyDown}
-            value={contributor.creator}
-            />
-          </div>
-        </div>
-      );
-    }) : '';
-
     return (
       <form
       className="bdrBox mb5 bdrBlack p10"
@@ -196,7 +151,48 @@ class EditIssueForm extends React.Component {
         </div>
         <div>
           <label>contributors</label>
-          {contributors}
+          {this.props.issue.contributors ? this.props.issue.contributors.map((contributor, index) => (
+            <div key={contributor.id} className="flex mb10 ml10">
+              <div className="mr10 w100">
+                <div className="flex">
+                  <label className="mr5" htmlFor={`creator_type${index}`}>type</label>
+                  <span>[{contributor.creator_type_id}]</span>
+                </div>
+                <input
+                className="bdrBox bdrBlack p5 wFull"
+                data-contributor-id={contributor.id}
+                data-contributor-index={index}
+                data-contributor-key="creator_type"
+                id={`creator_type${index}`}
+                name={`creator_type${index}`}
+                onBlur={this.props.handleInputBlur}
+                onChange={this.props.handleContributorTextChange}
+                onFocus={this.props.handleContributorTextChange}
+                onKeyDown={this.props.handleInputKeyDown}
+                value={contributor.creator_type}
+                />
+              </div>
+              <div className="wFull">
+                <div className="flex">
+                  <label className="mr5" htmlFor={`creator${index}`}>name</label>
+                  <span>[{contributor.creator_id}]</span>
+                </div>
+                <input
+                className="bdrBox bdrBlack p5 wFull"
+                data-contributor-id={contributor.id}
+                data-contributor-index={index}
+                data-contributor-key="creator"
+                id={`creator${index}`}
+                name={`creator${index}`}
+                onBlur={this.props.handleInputBlur}
+                onChange={this.props.handleContributorTextChange}
+                onFocus={this.props.handleContributorTextChange}
+                onKeyDown={this.props.handleInputKeyDown}
+                value={contributor.creator}
+                />
+              </div>
+            </div>
+          )) : null}
           <i aria-hidden={true} className={`ml10 fs14 fas fa-plus pointer`} onClick={this.props.addContributor}></i>
         </div>
         {this.props.user.isAdmin && (
