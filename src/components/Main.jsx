@@ -8,6 +8,14 @@ import SignInForm from './SignInForm';
 
 import * as utils from '../utils';
 
+const KEYS = {
+  DOWN: 40,
+  ENTER: 13,
+  ESCAPE: 27,
+  TAB: 9,
+  UP: 38
+};
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -348,7 +356,11 @@ class Main extends React.Component {
 
     const keyCode = event.which || event.keyCode || window.event.keyCode;
 
-    if (keyCode === 38) {
+    if (keyCode === KEYS.ESCAPE) {
+      this.handleInputBlur();
+    }
+
+    if (keyCode === KEYS.UP) {
       if (typeof this.state.autocompleteIndex === 'number') {
         autocompleteIndex = autocompleteIndex === 0 ? this.state.autocomplete.length - 1 : autocompleteIndex - 1;
       } else {
@@ -362,7 +374,7 @@ class Main extends React.Component {
       });
     }
 
-    if (keyCode === 40) {
+    if (keyCode === KEYS.DOWN) {
       if (typeof autocompleteIndex === 'number') {
         autocompleteIndex = autocompleteIndex === this.state.autocomplete.length - 1 ? 0 : autocompleteIndex + 1;
       } else {
@@ -376,16 +388,20 @@ class Main extends React.Component {
       });
     }
 
-    if ((keyCode === 9 || keyCode === 13) && typeof autocompleteIndex === 'number') {
+    if ((keyCode === KEYS.TAB || keyCode === KEYS.ENTER) && typeof autocompleteIndex === 'number') {
       const issue = this.state.issue;
 
       if (typeof contributorIndex === 'number') {
         issue.contributors[contributorIndex][contributorKey] = this.state.autocomplete[autocompleteIndex];
       } else {
         issue[autocompleteKey] = this.state.autocomplete[autocompleteIndex];
+
+        if (autocompleteKey === 'title') {
+          issue['sort_title'] = this.state.autocomplete[autocompleteIndex];
+        }
       }
 
-      if (keyCode === 13) {
+      if (keyCode === KEYS.ENTER) {
         event.preventDefault();
       }
 
