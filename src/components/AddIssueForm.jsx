@@ -1,6 +1,20 @@
 import React from 'react';
 
+import { KEYS } from './Main';
+
 class AddIssueForm extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleAddContributorKeyDown = event => {
+      const keyCode = event.which || event.keyCode || window.event.keyCode;
+
+      if (keyCode === KEYS.ENTER) {
+        props.addContributor();
+      }
+    }
+  }
+
   render() {
     return (
       <form
@@ -182,7 +196,13 @@ class AddIssueForm extends React.Component {
               </div>
             );
           }) : null}
-          <i aria-hidden={true} className={`ml10 fs14 fas fa-plus pointer`} onClick={this.props.addContributor}></i>
+          <i
+          aria-hidden={true}
+          className={`ml10 fs14 fas fa-plus pointer`}
+          onClick={this.props.addContributor}
+          onKeyDown={this.handleAddContributorKeyDown}
+          tabIndex="0"
+          />
         </div>
         {this.props.user.isAdmin && (
           <div className="flex flexEnd mt10">
