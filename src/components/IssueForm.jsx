@@ -20,7 +20,7 @@ class EditIssueForm extends React.Component {
       <form
       className="bdrBox mb5 bdrBlack p10"
       id="issue"
-      onSubmit={this.props.updateIssue}
+      onSubmit={this.props.handleSubmit}
       >
         <div className="flex spaceBetween alignCenter mb10">
           <h2 className="bold">
@@ -86,7 +86,7 @@ class EditIssueForm extends React.Component {
             onChange={this.props.handleIssueTextChange}
             onFocus={this.props.handleIssueTextChange}
             onKeyDown={this.props.handleInputKeyDown}
-            value={this.props.issue.title}
+            value={this.props.issue.title || ''}
             />
           </div>
           <div className="mb10 w100">
@@ -97,7 +97,9 @@ class EditIssueForm extends React.Component {
             name="numbers"
             onBlur={this.props.handleInputBlur}
             onChange={this.props.handleIssueTextChange}
-            value={this.props.issue.number || ''}
+            onFocus={this.props.handleIssueTextChange}
+            onKeyDown={this.props.handleInputKeyDown}
+            value={this.props.issue.number || this.props.issue.numbers || ''}
             />
           </div>
         </div>
@@ -107,8 +109,11 @@ class EditIssueForm extends React.Component {
           className="bdrBox bdrBlack p5 wFull"
           id="sort_title"
           name="sort_title"
-          readOnly={true}
-          value={this.props.issue.sort_title}
+          onBlur={this.props.handleInputBlur}
+          onChange={this.props.handleIssueTextChange}
+          onFocus={this.props.handleIssueTextChange}
+          onKeyDown={this.props.handleInputKeyDown}
+          value={this.props.issue.sort_title || ''}
           />
         </div>
         <div className="mb10">
@@ -150,7 +155,7 @@ class EditIssueForm extends React.Component {
           onChange={this.props.handleIssueTextChange}
           onFocus={this.props.handleIssueTextChange}
           onKeyDown={this.props.handleInputKeyDown}
-          value={this.props.issue.format}
+          value={this.props.issue.format || ''}
           />
         </div>
         <div className="mb10">
@@ -160,13 +165,13 @@ class EditIssueForm extends React.Component {
           id="notes"
           name="notes"
           onChange={this.props.handleIssueTextChange}
-          value={this.props.issue.notes}
+          value={this.props.issue.notes || ''}
           />
         </div>
-        <div>
+        <div id="contributors">
           <label>contributors</label>
           {this.props.issue.contributors ? this.props.issue.contributors.map((contributor, index) => (
-            <div key={contributor.id} className="flex mb10 ml10">
+            <div key={index} className="flex mb10 ml10">
               <div className="mr10 w100">
                 <div className="flex">
                   <label className="mr5" htmlFor={`creator_type${index}`}>type</label>
@@ -183,7 +188,7 @@ class EditIssueForm extends React.Component {
                 onChange={this.props.handleContributorTextChange}
                 onFocus={this.props.handleContributorTextChange}
                 onKeyDown={this.props.handleInputKeyDown}
-                value={contributor.creator_type}
+                value={contributor.creator_type || ''}
                 />
               </div>
               <div className="wFull">
@@ -202,7 +207,7 @@ class EditIssueForm extends React.Component {
                 onChange={this.props.handleContributorTextChange}
                 onFocus={this.props.handleContributorTextChange}
                 onKeyDown={this.props.handleInputKeyDown}
-                value={contributor.creator}
+                value={contributor.creator || ''}
                 />
               </div>
             </div>
@@ -221,7 +226,7 @@ class EditIssueForm extends React.Component {
             className="bdrBlack p5 pointer"
             type="submit"
             >
-              update issue
+              {this.props.buttonLabel}
             </button>
           </div>
         )}

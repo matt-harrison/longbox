@@ -2,8 +2,7 @@ import React from 'react';
 import axios from 'axios';
 import md5 from 'md5';
 
-import AddIssueForm from './AddIssueForm';
-import EditIssueForm from './EditIssueForm';
+import IssueForm from './IssueForm';
 import SignInForm from './SignInForm';
 
 import * as utils from '../utils';
@@ -230,25 +229,6 @@ class Main extends React.Component {
     }).catch(error => {});
   };
 
-  handleAddIssueFormClose = () => {
-    this.setState({
-      showAddIssueForm: false
-    });
-  };
-
-  handleEditIssueFormClose = () => {
-    let search = this.state.search;
-
-    search.issue_id = '';
-
-    this.setState({
-      errors: [],
-      search
-    }, () => {
-      this.setIssue();
-    });
-  };
-
   handleContributorTextChange = event => {
     let   autocomplete     = [];
     const issue            = this.state.issue;
@@ -313,6 +293,21 @@ class Main extends React.Component {
     issue[key] = !issue[key];
 
     this.setState({issue});
+  };
+
+  handleIssueFormClose = () => {
+    let search = this.state.search;
+
+    search.issue_id = '';
+
+    this.setState({
+      errors: [],
+      search,
+      showAddIssueForm: false,
+      showEditIssueForm: false
+    }, () => {
+      this.setIssue();
+    });
   };
 
   handleIssueTextChange = async event => {
@@ -602,7 +597,7 @@ class Main extends React.Component {
     });
   };
 
-  toggleShowAddIssueForm = () => {
+  toggleAddIssueForm = () => {
     const showAddIssueForm = !this.state.showAddIssueForm;
     let search = this.state.search;
 
@@ -615,7 +610,7 @@ class Main extends React.Component {
       showAddIssueForm,
       showEditIssueForm: false
     }, () => {
-      this.setUrl()
+      this.setUrl();
     });
   };
 
@@ -723,7 +718,7 @@ class Main extends React.Component {
           </div>
           <div className="flex alignCenter">
             {this.state.user.isAdmin && (
-              <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleShowAddIssueForm}></i>
+              <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleAddIssueForm}></i>
             )}
             <i aria-hidden={true} className={`mr5 fas fa-check-square ${this.state.showQuickToggle ? '' : 'txtRed'} pointer`} onClick={this.toggleShowQuickToggle}></i>
             <i aria-hidden={true} className={`mr5 fas fa-folder ${this.state.isGroupedByTitle ? '' : 'txtRed'} pointer`} onClick={this.toggleIsGroupedByTitle}></i>
@@ -750,33 +745,19 @@ class Main extends React.Component {
             <i aria-hidden={true} className="clearSearchButton fas fa-times absolute pointer fs14" onClick={this.clearSearch}></i>
           </section>
         )}
-        {this.state.showAddIssueForm && (
-          <AddIssueForm
+        {(this.state.showAddIssueForm || this.state.showEditIssueForm) && (
+          <IssueForm
           addContributor={this.addContributor}
+          buttonLabel={this.state.showAddIssueForm ? 'add issue(s)' : 'update issue'}
           errors={this.state.errors}
-          handleClose={this.handleAddIssueFormClose}
+          handleClose={this.handleIssueFormClose}
           handleInputBlur={this.handleInputBlur}
           handleContributorTextChange={this.handleContributorTextChange}
           handleIssueCheckboxChange={this.handleIssueCheckboxChange}
           handleIssueTextChange={this.handleIssueTextChange}
           handleInputKeyDown={this.handleInputKeyDown}
+          handleSubmit={this.state.showAddIssueForm ? this.addIssue : this.updateIssue}
           issue={this.state.issue}
-          addIssue={this.addIssue}
-          user={this.state.user}
-          />
-        )}
-        {this.state.showEditIssueForm && (
-          <EditIssueForm
-          addContributor={this.addContributor}
-          errors={this.state.errors}
-          handleClose={this.handleEditIssueFormClose}
-          handleInputBlur={this.handleInputBlur}
-          handleContributorTextChange={this.handleContributorTextChange}
-          handleIssueCheckboxChange={this.handleIssueCheckboxChange}
-          handleIssueTextChange={this.handleIssueTextChange}
-          handleInputKeyDown={this.handleInputKeyDown}
-          issue={this.state.issue}
-          updateIssue={this.updateIssue}
           user={this.state.user}
           />
         )}
