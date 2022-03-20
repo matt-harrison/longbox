@@ -1,4 +1,4 @@
-rm -rf ../rbc/apps/longbox/
+rm -rf ../rootbeercomics/apps/longbox/
 cp -r build/ longbox/
-mv longbox ../rbc/apps/longbox
-scp -r ../rbc/apps/longbox kittenb1@rootbeercomics.com:/home1/kittenb1/www/apps/
+mv longbox ../rootbeercomics/apps/longbox/
+scp -r ../rootbeercomics/apps/longbox kittenb1@rootbeercomics.com:/home1/kittenb1/www/apps/
