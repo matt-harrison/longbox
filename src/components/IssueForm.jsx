@@ -2,7 +2,7 @@ import React from 'react';
 
 import { KEYS } from './Main';
 
-class EditIssueForm extends React.Component {
+class IssueForm extends React.Component {
   constructor(props) {
     super(props);
 
@@ -235,4 +235,4 @@ class EditIssueForm extends React.Component {
   }
 }
 
-export default EditIssueForm;
+export default IssueForm;

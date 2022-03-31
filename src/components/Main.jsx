@@ -195,6 +195,26 @@ class Main extends React.Component {
     });
   };
 
+  duplicateIssue = () => {
+    let issue = JSON.parse(JSON.stringify(this.state.issue));
+    let search = this.state.search;
+
+    search.issue_id = '';
+
+    issue.id = null;
+    issue.number = null;
+
+    this.setState({
+      errors: [],
+      issue,
+      search,
+      showAddIssueForm: true,
+      showEditIssueForm: false
+    }, () => {
+      this.setUrl();
+    });
+  };
+
   getIssues = () => {
     const data = {
       params: {
@@ -717,6 +737,9 @@ class Main extends React.Component {
             <h1 className="fs14 bold pointer" onClick={this.resetUrl}>longbox</h1>
           </div>
           <div className="flex alignCenter">
+            {this.state.user.isAdmin && this.state.issue && (
+              <i aria-hidden={true} className="mr5 fas fa-clone pointer" onClick={this.duplicateIssue}></i>
+            )}
             {this.state.user.isAdmin && (
               <i aria-hidden={true} className={`mr5 fas fa-edit ${this.state.showAddIssueForm ? '' : 'txtRed'} pointer`} onClick={this.toggleAddIssueForm}></i>
             )}
