@@ -63,8 +63,8 @@ class Main extends React.Component {
         username:  ''
       },
       search: {
-        any: params.has('any') ? params.get('any') : '',
-        issue_id: params.has('id') ? params.get('id') : ''
+        any: params.has('any') ? params.get('any') : null,
+        issue_id: params.has('id') ? params.get('id') : null
       },
       showAddIssueForm: false,
       showEditIssueForm: false,
