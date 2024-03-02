@@ -116,6 +116,8 @@ input[type="text"], input[type="password"], button, select, .fas, .lineHeight1 {
   text-decoration: underline;
 }
 
+.col-span-all {column-span: all;}
+
 .clearSearchButton {
   top: 5px;
   right: 7px;

@@ -15,6 +15,12 @@ const KEYS = {
   UP: 38
 };
 
+const STATUS = {
+  NONE: '',
+  PENDING: '...',
+  NO_RESULTS: 'No issues found.',
+};
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -63,13 +69,14 @@ class Main extends React.Component {
         username:  ''
       },
       search: {
-        any: params.has('any') ? params.get('any') : null,
-        issue_id: params.has('id') ? params.get('id') : null
+        any: params.has('any') ? params.get('any') : '',
+        issue_id: params.has('id') ? params.get('id') : ''
       },
       showAddIssueForm: false,
       showEditIssueForm: false,
       showQuickToggle: params.has('toggle') ? params.get('toggle') === 'true' : false,
       showSignInForm: false,
+      status: STATUS.NONE,
       user
     };
   };
@@ -227,6 +234,10 @@ class Main extends React.Component {
       data.cancelToken = this.state.cancelToken.token;
     }
 
+    this.setState({
+      status: STATUS.PENDING,
+    });
+
     axios.get('https://www.rootbeercomics.com/api/longbox/issues.php', data).then(response => {
       if (response) {
         response.data.issues.results.forEach(issue => {
@@ -239,7 +250,8 @@ class Main extends React.Component {
 
         this.setState({
           cancelToken: null,
-          issues: response.data.issues.results
+          issues: response.data.issues.results,
+          status: response.data.issues.results.length > 0 ? STATUS.NONE : STATUS.NO_RESULTS,
         }, () => {
           if (this.state.search.issue_id) {
             this.setIssue(this.state.search.issue_id);
@@ -748,6 +760,7 @@ class Main extends React.Component {
             {signInOutButton}
           </div>
         </div>
+
         {this.state.showSignInForm &&
           <SignInForm
           handleLoginChange={this.handleLoginChange}
@@ -756,6 +769,7 @@ class Main extends React.Component {
           username={this.state.login.username}
           />
         }
+
         {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
           <section id="search" className="relative mb5">
             <input
@@ -768,6 +782,7 @@ class Main extends React.Component {
             <i aria-hidden={true} className="clearSearchButton fas fa-times absolute pointer fs14" onClick={this.clearSearch}></i>
           </section>
         )}
+
         {(this.state.showAddIssueForm || this.state.showEditIssueForm) && (
           <IssueForm
           addContributor={this.addContributor}
@@ -784,6 +799,7 @@ class Main extends React.Component {
           user={this.state.user}
           />
         )}
+
         {showTitles && (
           <section id="titles" className="list grid bdrBox mb5 bdrBlack p5">
             {titles.length > 0 ? titles.map((title, index) => (
@@ -801,9 +817,10 @@ class Main extends React.Component {
                   </span>
                 </div>
               </React.Fragment>
-            )) : (<div>...</div>)}
+            )) : (<div class="whitespace-no-wrap">{this.state.status}</div>)}
           </section>
         )}
+
         {showIssues && (
           <section id="issues" className="list grid bdrBox mb5 bdrBlack p5">
             {this.state.issues.length > 0 ? this.state.issues.map((issue, index) => (
@@ -816,16 +833,20 @@ class Main extends React.Component {
                   {issue.title}{issue.number ? ` #${issue.number}` : ''}
                 </span>
               </React.Fragment>
-            )) : (<div>...</div>)}
+            )) : (<div class="whitespace-no-wrap">{this.state.status}</div>)}
           </section>
         )}
+
         {showQuickToggle && (
           <table id="quick-toggle" className="bdrBox mb5 bdrBlack p5 flex100">
             <tbody>
               {this.state.issues.length > 0 ? this.state.issues.map((issue, index) => (
                 <tr key={index}>
+                  <td className="mr5 txtR">
+                    {index + 1}.
+                  </td>
+
                   <td>
-                    <span className="mr5 txtR">{index + 1}.</span>
                     <span
                     onClick={() => {this.setIssue(issue.id)}}
                     className="pointer underline-on-hover"
@@ -833,6 +854,7 @@ class Main extends React.Component {
                       {issue.title}{issue.number ? ` #${issue.number}` : ''}
                     </span>
                   </td>
+
                   <td className="mr10 whitespace-no-wrap">
                     <input
                     checked={issue.is_read}
@@ -855,6 +877,7 @@ class Main extends React.Component {
                       read
                     </label>
                   </td>
+
                   <td className="mr10 whitespace-no-wrap">
                     <input
                     checked={issue.is_owned}
@@ -877,6 +900,7 @@ class Main extends React.Component {
                       owned
                     </label>
                   </td>
+
                   <td className="whitespace-no-wrap">
                     <input
                     checked={issue.is_color}
@@ -900,10 +924,11 @@ class Main extends React.Component {
                     </label>
                   </td>
                 </tr>
-              )) : (<tr><td colSpan="4">...</td></tr>)}
+              )) : (<tr><td class="col-span-all">{this.state.status}</td></tr>)}
             </tbody>
           </table>
         )}
+
         <div
         className={`absolute bdrBlack bgWhite overflow-hidden ${this.state.autocomplete.length > 0 ? '' : 'hidden'}`}
         id="autocomplete"
