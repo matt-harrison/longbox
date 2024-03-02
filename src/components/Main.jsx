@@ -69,8 +69,9 @@ class Main extends React.Component {
         username:  ''
       },
       search: {
-        any: params.has('any') ? params.get('any') : '',
-        issue_id: params.has('id') ? params.get('id') : ''
+        any: params.has('any') ? params.get('any') : undefined,
+        issue_id: params.has('id') ? params.get('id') : undefined,
+        limit: params.has('limit') & params.get('limit') !== '' ? params.get('limit') : undefined,
       },
       showAddIssueForm: false,
       showEditIssueForm: false,
@@ -226,7 +227,7 @@ class Main extends React.Component {
     const data = {
       params: {
         ...this.state.search,
-        order_by: 'sort_title, number'
+        order_by: 'sort_title, number',
       }
     };
 
@@ -556,6 +557,10 @@ class Main extends React.Component {
 
     if (this.state.search.any) {
       params.push(`any=${this.state.search.any}`);
+    }
+
+    if (this.state.search.limit) {
+      params.push(`limit=${this.state.search.limit}`);
     }
 
     if (this.state.showQuickToggle) {
