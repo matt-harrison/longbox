@@ -778,6 +778,7 @@ class Main extends React.Component {
         {!this.state.showAddIssueForm && !this.state.showEditIssueForm && (
           <section id="search" className="relative mb5">
             <input
+            autocomplete="off"
             className="searchFieldAny mr10 bdrBox bdrBlack p5 wFull"
             name="any"
             onChange={this.handleSearchChange}
@@ -862,6 +863,7 @@ class Main extends React.Component {
 
                   <td className="mr10 whitespace-no-wrap">
                     <input
+                    autocomplete="off"
                     checked={issue.is_read}
                     className="inline-block mr5 pointer"
                     id={`read${index}`}
@@ -885,6 +887,7 @@ class Main extends React.Component {
 
                   <td className="mr10 whitespace-no-wrap">
                     <input
+                    autocomplete="off"
                     checked={issue.is_owned}
                     className="inline-block mr5 pointer"
                     id={`owned${index}`}
@@ -908,6 +911,7 @@ class Main extends React.Component {
 
                   <td className="whitespace-no-wrap">
                     <input
+                    autocomplete="off"
                     checked={issue.is_color}
                     className="inline-block mr5 pointer"
                     id={`color${index}`}

@@ -40,6 +40,7 @@ class IssueForm extends React.Component {
         <div className="flex spaceBetween mb10">
           <div className="flex">
             <input
+            autocomplete="off"
             checked={this.props.issue.is_read}
             className="mr5 bdrBlack p5"
             id="is_read"
@@ -51,6 +52,7 @@ class IssueForm extends React.Component {
           </div>
           <div className="flex">
             <input
+            autocomplete="off"
             checked={this.props.issue.is_owned}
             className="mr5 bdrBlack p5"
             id="is_owned"
@@ -62,6 +64,7 @@ class IssueForm extends React.Component {
           </div>
           <div className="flex">
             <input
+            autocomplete="off"
             checked={this.props.issue.is_color}
             className="mr5 bdrBlack p5"
             id="is_color"
@@ -79,6 +82,7 @@ class IssueForm extends React.Component {
               <span>[{this.props.issue.title_id}]</span>
             </div>
             <input
+            autocomplete="off"
             className="bdrBox bdrBlack p5 wFull"
             id="title"
             name="title"
@@ -92,6 +96,7 @@ class IssueForm extends React.Component {
           <div className="mb10 w100">
             <label htmlFor="numbers">number(s)</label>
             <input
+            autocomplete="off"
             className="bdrBox bdrBlack p5 wFull"
             id="numbers"
             name="numbers"
@@ -122,6 +127,7 @@ class IssueForm extends React.Component {
             <span>[{this.props.issue.publisher_id}]</span>
           </div>
           <input
+          autocomplete="off"
           className="bdrBox bdrBlack p5 wFull"
           id="publisher"
           name="publisher"
@@ -135,6 +141,7 @@ class IssueForm extends React.Component {
         <div className="mb10">
           <label htmlFor="year">year</label>
           <input
+          autocomplete="off"
           className="bdrBox bdrBlack p5 wFull"
           id="year"
           name="year"
@@ -148,6 +155,7 @@ class IssueForm extends React.Component {
             <span>[{this.props.issue.format_id}]</span>
           </div>
           <input
+          autocomplete="off"
           className="bdrBox bdrBlack p5 wFull"
           id="format"
           name="format"
@@ -178,6 +186,7 @@ class IssueForm extends React.Component {
                   <span>[{contributor.creator_type_id}]</span>
                 </div>
                 <input
+                autocomplete="off"
                 className="bdrBox bdrBlack p5 wFull"
                 data-contributor-id={contributor.id}
                 data-contributor-index={index}
@@ -197,6 +206,7 @@ class IssueForm extends React.Component {
                   <span>[{contributor.creator_id}]</span>
                 </div>
                 <input
+                autocomplete="off"
                 className="bdrBox bdrBlack p5 wFull"
                 data-contributor-id={contributor.id}
                 data-contributor-index={index}
